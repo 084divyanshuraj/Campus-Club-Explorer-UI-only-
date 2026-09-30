@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusConnect - Campus Club Explorer | Find Your Community</title>
+  <meta name="description" content="Explore campus clubs, connect with like-minded students, and discover extracurricular opportunities at CampusConnect.">
+  
+  <!-- Modern Google Font: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- =========================================================
+       1. NAVIGATION BAR
+       ========================================================= -->
+  <header class="navbar" id="topNav">
+    <div class="nav-container">
+      <!-- Brand Logo -->
+      <a href="#home" class="brand-logo" id="brandLogo">
+        <span class="logo-icon-box">
+          <!-- Graduation Cap & Sparkle SVG Icon -->
+          <svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </span>
+        <span class="logo-text">Campus<span class="logo-accent">Connect</span></span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="nav-links" id="navLinks">
+        <a href="#home" class="nav-link active" id="navLinkHome">Home</a>
+        <a href="#clubsSection" class="nav-link" id="navLinkClubs">Explore Clubs</a>
+        <a href="#aboutSection" class="nav-link" id="navLinkAbout">About</a>
+        <button type="button" class="btn btn-primary nav-cta-btn" id="navJoinBtn" onclick="openJoinModal()">
+          Join a Club
+        </button>
+      </nav>
+
+      <!-- Hamburger Menu Button for Mobile -->
+      <button type="button" class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       2. HERO SECTION
+       ========================================================= -->
+  <section class="hero-section" id="home">
+    <div class="hero-container">
+      
+      <!-- Hero Text Content -->
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span>Official Student Community Portal</span>
+        </div>
+
+        <h1 class="hero-title">
+          Find Your People.<br>
+          <span class="gradient-text">Discover Your Passion.</span>
+        </h1>
+
+        <p class="hero-description">
+          Explore campus communities, connect with like-minded students, and discover opportunities to grow beyond the classroom.
+        </p>
+
+        <!-- Search Bar in Hero -->
+        <div class="hero-search-box">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" 
+              id="heroSearchInput" 
+              class="hero-search-input" 
+              placeholder="Search by club name or category (e.g. Coding, Robotics)..."
+              autocomplete="off"
+            >
+          </div>
+          <button type="button" class="btn btn-primary" id="heroExploreBtn" onclick="scrollToClubs()">
+            Explore Clubs
+          </button>
+        </div>
+
+        <!-- Quick Stats Strip -->
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">8+</span>
+            <span class="stat-label">Active Clubs</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">2,200+</span>
+            <span class="stat-label">Student Members</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">60+</span>
+            <span class="stat-label">Annual Events</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Student-Led</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Graphic: Decorative CSS Card Showcase -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="visual-glow-circle"></div>
+        <div class="visual-glow-circle circle-secondary"></div>
+        
+        <div class="showcase-card showcase-main">
+          <div class="showcase-header">
+            <div class="showcase-avatar">🚀</div>
+            <div>
+              <div class="showcase-title">Campus Hub</div>
+              <div class="showcase-sub">Connecting 2026 Batch</div>
+            </div>
+            <span class="showcase-status-badge">Active</span>
+          </div>
+          <div class="showcase-body">
+            <div class="showcase-tag-list">
+              <span class="mini-tag">#Coding</span>
+              <span class="mini-tag">#Sports</span>
+              <span class="mini-tag">#Arts</span>
+              <span class="mini-tag">#Robotics</span>
+            </div>
+            <p class="showcase-text">Find workshops, weekly meetups, hackathons, and cultural fests right on campus.</p>
+          </div>
+        </div>
+
+        <!-- Floating Decorative Card 1 -->
+        <div class="floating-card float-top">
+          <div class="float-icon">🏆</div>
+          <div>
+            <div class="float-title">Hackathon 2026</div>
+            <div class="float-desc">ACM Chapter • 48 hrs left</div>
+          </div>
+        </div>
+
+        <!-- Floating Decorative Card 2 -->
+        <div class="floating-card float-bottom">
+          <div class="float-icon">📸</div>
+          <div>
+            <div class="float-title">Weekend Photo Walk</div>
+            <div class="float-desc">Photography Club • 45 joined</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       3. CLUBS EXPLORATION SECTION
+       ========================================================= -->
+  <section class="clubs-section" id="clubsSection">
+    <div class="section-container">
+      
+      <!-- Section Header -->
+      <div class="section-header">
+        <span class="section-badge">CAMPUS DIRECTORY</span>
+        <h2 class="section-title">Explore Student Clubs</h2>
+        <p class="section-subtitle">
+          Filter by your interests or use the search bar to find the perfect student organization for your journey.
+        </p>
+      </div>
+
+      <!-- Search & Results Controls -->
+      <div class="controls-wrapper">
+        <!-- Main Search Bar -->
+        <div class="search-bar-container">
+          <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="text" 
+            id="clubSearchInput" 
+            class="club-search-input" 
+            placeholder="Search clubs by name or category (e.g., 'ACM', 'Technology', 'Sports')..."
+            autocomplete="off"
+          >
+          <button type="button" class="clear-search-btn" id="clearSearchBtn" title="Clear search">
+            &times;
+          </button>
+        </div>
+
+        <!-- Active Filter Counter -->
+        <div class="results-meta">
+          <span id="resultsCount">Showing 8 clubs</span>
+        </div>
+      </div>
+
+      <!-- Category Filter Buttons -->
+      <div class="category-filters-container" id="categoryContainer">
+        <!-- Generated by JavaScript or static buttons with active states -->
+        <button type="button" class="category-btn active" data-category="All Clubs">All Clubs</button>
+        <button type="button" class="category-btn" data-category="Technology">Technology</button>
+        <button type="button" class="category-btn" data-category="Sports">Sports</button>
+        <button type="button" class="category-btn" data-category="Arts & Culture">Arts & Culture</button>
+        <button type="button" class="category-btn" data-category="Photography">Photography</button>
+        <button type="button" class="category-btn" data-category="Entrepreneurship">Entrepreneurship</button>
+        <button type="button" class="category-btn" data-category="Social Service">Social Service</button>
+      </div>
+
+      <!-- Club Cards Grid Container -->
+      <div class="clubs-grid" id="clubsGrid">
+        <!-- Dynamic Club Cards will be injected here via script.js -->
+      </div>
+
+      <!-- Empty State: Displayed when no clubs match search/filter -->
+      <div class="empty-state" id="noResultsMessage" style="display: none;">
+        <div class="empty-state-icon">🔍</div>
+        <h3 class="empty-state-title">No clubs found</h3>
+        <p class="empty-state-desc">
+          We couldn't find any club matching your search. Try checking your spelling or selecting "All Clubs" to see all options.
+        </p>
+        <button type="button" class="btn btn-secondary" onclick="resetAllFilters()">
+          Reset All Filters
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       4. ABOUT CAMPUS CLUBS SECTION
+       ========================================================= -->
+  <section class="about-section" id="aboutSection">
+    <div class="section-container">
+      
+      <div class="section-header">
+        <span class="section-badge">CAMPUS LIFE & GROWTH</span>
+        <h2 class="section-title">Why Join a Campus Club?</h2>
+        <p class="section-subtitle">
+          College is more than lectures and exams. Joining clubs helps you build real projects, form lifelong friendships, and prepare for career opportunities.
+        </p>
+      </div>
+
+      <div class="about-cards-grid">
+        <!-- Feature 1 -->
+        <div class="about-card">
+          <div class="about-icon-box bg-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </div>
+          <h3 class="about-card-title">Skill Acceleration</h3>
+          <p class="about-card-text">
+            Gain hands-on experience through hackathons, tournaments, workshops, and practical team assignments beyond textbooks.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="about-card">
+          <div class="about-icon-box bg-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3 class="about-card-title">Meaningful Network</h3>
+          <p class="about-card-text">
+            Meet ambitious peers, collaborate with senior mentors, and connect with distinguished alumni working across global industries.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="about-card">
+          <div class="about-icon-box bg-indigo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="7"></circle>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            </svg>
+          </div>
+          <h3 class="about-card-title">Leadership & Fun</h3>
+          <p class="about-card-text">
+            Lead student teams, organize college fests, make unforgettable memories, and earn certificates for leadership positions.
+          </p>
+        </div>
+      </div>
+
+      <!-- Testimonial / Community Callout -->
+      <div class="community-banner">
+        <div class="community-content">
+          <h3 class="community-title">Ready to take your campus experience to the next level?</h3>
+          <p class="community-desc">Membership is open to students across all branches and academic years. Start your club journey today.</p>
+        </div>
+        <button type="button" class="btn btn-light" onclick="openJoinModal()">
+          Join a Club Now
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       5. FOOTER
+       ========================================================= -->
+  <footer class="footer">
+    <div class="footer-container">
+      
+      <div class="footer-top">
+        <!-- Col 1: Brand Info -->
+        <div class="footer-col brand-col">
+          <div class="footer-logo">
+            <span class="logo-icon-box">
+              <svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg>
+            </span>
+            <span class="logo-text">Campus<span class="logo-accent">Connect</span></span>
+          </div>
+          <p class="footer-desc">
+            The unified student club discovery portal. Helping every undergraduate student find their community, pursue passions, and build real-world leadership.
+          </p>
+          <div class="footer-badge">
+            🎓 Student Affairs & Extracurricular Council
+          </div>
+        </div>
+
+        <!-- Col 2: Quick Links -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Quick Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#clubsSection">Explore Clubs</a></li>
+            <li><a href="#aboutSection">About Clubs</a></li>
+            <li><a href="javascript:void(0)" onclick="openJoinModal()">Join a Club</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Club Categories -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Categories</h4>
+          <ul class="footer-links">
+            <li><a href="javascript:void(0)" onclick="filterFromFooter('Technology')">Technology & Coding</a></li>
+            <li><a href="javascript:void(0)" onclick="filterFromFooter('Sports')">Sports & Athletics</a></li>
+            <li><a href="javascript:void(0)" onclick="filterFromFooter('Arts & Culture')">Arts & Culture</a></li>
+            <li><a href="javascript:void(0)" onclick="filterFromFooter('Entrepreneurship')">Entrepreneurship</a></li>
+            <li><a href="javascript:void(0)" onclick="filterFromFooter('Social Service')">Social Service</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Campus Help -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Student Support</h4>
+          <p class="footer-small-text">
+            Have questions about club registration, auditions, or starting a new club chapter?
+          </p>
+          <div class="support-email-box">
+            <span class="email-label">Email Coordinator:</span>
+            <span class="email-value">clubs@campusconnect.edu</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom">
+        <p class="copyright-text">
+          &copy; 2026 CampusConnect. All rights reserved.
+        </p>
+        <p class="student-credit">
+          Made for students, by students. ❤️
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       6. CLUB DETAILS MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="clubDetailsModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-labelledby="detailClubName">
+      
+      <!-- Close Button -->
+      <button type="button" class="modal-close-btn" id="closeDetailModalBtn" onclick="closeDetailModal()" aria-label="Close modal">
+        &times;
+      </button>
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="detail-icon-box" id="detailIconBox">
+          <!-- Icon injected by JS -->
+        </div>
+        <div class="detail-header-text">
+          <span class="club-category-pill" id="detailClubCategory">Category</span>
+          <h3 class="detail-title" id="detailClubName">Club Name</h3>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        
+        <!-- Meta Details Box: Members & Schedule -->
+        <div class="detail-meta-grid">
+          <div class="detail-meta-item">
+            <div class="meta-icon">👥</div>
+            <div>
+              <div class="meta-label">Active Members</div>
+              <div class="meta-value" id="detailMembersCount">0 students</div>
+            </div>
+          </div>
+          <div class="detail-meta-item">
+            <div class="meta-icon">📅</div>
+            <div>
+              <div class="meta-label">Meeting Schedule</div>
+              <div class="meta-value" id="detailMeetingSchedule">Weekly schedule</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- About Description -->
+        <div class="detail-section">
+          <h4 class="detail-subheading">About the Club</h4>
+          <p class="detail-description" id="detailDescription">
+            Club description will appear here.
+          </p>
+        </div>
+
+        <!-- Key Activities -->
+        <div class="detail-section">
+          <h4 class="detail-subheading">Key Activities & Events</h4>
+          <ul class="detail-activities-list" id="detailActivitiesList">
+            <!-- Activities injected by JS -->
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeDetailModal()">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" id="detailJoinBtn" onclick="switchToJoinFromDetails()">
+          Join This Club
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       7. JOIN CLUB REGISTRATION FORM MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="joinClubModal" aria-hidden="true">
+    <div class="modal-card modal-form-card" role="dialog" aria-labelledby="joinModalTitle">
+      
+      <!-- Close Button -->
+      <button type="button" class="modal-close-btn" id="closeJoinModalBtn" onclick="closeJoinModal()" aria-label="Close modal">
+        &times;
+      </button>
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="detail-icon-box join-icon-box">
+          ✍️
+        </div>
+        <div class="detail-header-text">
+          <span class="club-category-pill">Membership Registration</span>
+          <h3 class="detail-title" id="joinModalTitle">Join a Campus Club</h3>
+        </div>
+      </div>
+
+      <!-- Form Content -->
+      <div class="modal-body">
+        
+        <!-- Validation Error Message Alert (Hidden by default) -->
+        <div class="form-alert alert-error" id="formErrorAlert" style="display: none;">
+          <span class="alert-icon">⚠️</span>
+          <span id="formErrorMessage">Please fill in all fields correctly.</span>
+        </div>
+
+        <!-- Success Message Alert (Hidden by default) -->
+        <div class="form-alert alert-success" id="formSuccessAlert" style="display: none;">
+          <span class="alert-icon">🎉</span>
+          <div class="success-text-box">
+            <h4 class="success-title">Registration Successful!</h4>
+            <p id="formSuccessMessage">Your application has been received. Check your college inbox for upcoming club meeting details.</p>
+          </div>
+        </div>
+
+        <!-- Join Form -->
+        <form id="joinClubForm" onsubmit="handleJoinFormSubmit(event)" novalidate>
+          
+          <!-- Full Name Field -->
+          <div class="form-group">
+            <label for="studentName" class="form-label">
+              Student Full Name <span class="required-star">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="studentName" 
+              class="form-input" 
+              placeholder="e.g. Rahul Sharma" 
+              autocomplete="name"
+            >
+          </div>
+
+          <!-- College Email Field -->
+          <div class="form-group">
+            <label for="studentEmail" class="form-label">
+              College Email ID <span class="required-star">*</span>
+            </label>
+            <input 
+              type="email" 
+              id="studentEmail" 
+              class="form-input" 
+              placeholder="e.g. rahul.2026@college.edu" 
+              autocomplete="email"
+            >
+            <small class="form-help">Must be a valid email containing '@'</small>
+          </div>
+
+          <!-- Registration / Roll Number Field -->
+          <div class="form-group">
+            <label for="regNumber" class="form-label">
+              Registration / Roll Number <span class="required-star">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="regNumber" 
+              class="form-input" 
+              placeholder="e.g. 24BCSE1042" 
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- Club Selection Dropdown -->
+          <div class="form-group">
+            <label for="clubSelect" class="form-label">
+              Select Club to Join <span class="required-star">*</span>
+            </label>
+            <select id="clubSelect" class="form-select">
+              <option value="">-- Choose a Campus Club --</option>
+              <option value="ACM Student Chapter">ACM Student Chapter (Technology)</option>
+              <option value="Google Developer Student Club">Google Developer Student Club (Technology)</option>
+              <option value="Robotics Club">Robotics Club (Technology)</option>
+              <option value="Sports Club">Sports Club (Sports)</option>
+              <option value="Music & Dance Club">Music & Dance Club (Arts & Culture)</option>
+              <option value="Photography Club">Photography Club (Photography)</option>
+              <option value="Entrepreneurship Cell">Entrepreneurship Cell (Entrepreneurship)</option>
+              <option value="NSS Club">NSS Club (Social Service)</option>
+            </select>
+          </div>
+
+          <!-- Form Submit Button -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeJoinModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitJoinBtn">
+              Submit Application
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
