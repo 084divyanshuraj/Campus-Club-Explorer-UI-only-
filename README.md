@@ -123,7 +123,4 @@ This project is open-source and available under the [MIT License](LICENSE).
 
 ---
 
-<p align="center">
-  <b>Made with ❤️ for students, by students.</b><br>
-  <sub>CampusConnect &bull; 2026</sub>
-</p>
+
