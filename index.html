@@ -38,6 +38,9 @@
         <a href="#home" class="nav-link active" id="navLinkHome">Home</a>
         <a href="#clubsSection" class="nav-link" id="navLinkClubs">Explore Clubs</a>
         <a href="#aboutSection" class="nav-link" id="navLinkAbout">About</a>
+        <button type="button" class="btn btn-secondary nav-admin-btn" id="navAdminBtn" onclick="openAdminModal()">
+          <span>📋</span> Applications <span class="admin-badge" id="adminBadgeCount">0</span>
+        </button>
         <button type="button" class="btn btn-primary nav-cta-btn" id="navJoinBtn" onclick="openJoinModal()">
           Join a Club
         </button>
@@ -97,22 +100,22 @@
         <!-- Quick Stats Strip -->
         <div class="hero-stats">
           <div class="stat-item">
-            <span class="stat-number">8+</span>
+            <span class="stat-number" id="heroStatClubs">8+</span>
             <span class="stat-label">Active Clubs</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-number">2,200+</span>
+            <span class="stat-number" id="heroStatMembers">2,200+</span>
             <span class="stat-label">Student Members</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-number">60+</span>
+            <span class="stat-number" id="heroStatEvents">60+</span>
             <span class="stat-label">Annual Events</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-number">100%</span>
+            <span class="stat-number" id="heroStatLed">100%</span>
             <span class="stat-label">Student-Led</span>
           </div>
         </div>
@@ -578,6 +581,117 @@
 
         </form>
 
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       8. ADMIN APPLICATIONS MANAGEMENT MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="adminModal" aria-hidden="true">
+    <div class="modal-card modal-admin-card" role="dialog" aria-labelledby="adminModalTitle">
+      <!-- Close Button -->
+      <button type="button" class="modal-close-btn" id="closeAdminModalBtn" onclick="closeAdminModal()" aria-label="Close modal">
+        &times;
+      </button>
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="detail-icon-box admin-icon-box">
+          📊
+        </div>
+        <div class="detail-header-text">
+          <span class="club-category-pill cat-tech">Admin Control Center</span>
+          <h3 class="detail-title" id="adminModalTitle">Student Club Applications</h3>
+        </div>
+      </div>
+
+      <!-- Admin Body -->
+      <div class="modal-body admin-modal-body">
+        <!-- Toast / Status alert -->
+        <div class="admin-toast" id="adminToast" style="display: none;"></div>
+
+        <!-- Summary KPI Stats -->
+        <div class="admin-kpi-grid">
+          <div class="admin-kpi-card">
+            <span class="kpi-label">Total Applications</span>
+            <span class="kpi-value" id="kpiTotalApps">0</span>
+          </div>
+          <div class="admin-kpi-card kpi-pending">
+            <span class="kpi-label">Pending Review</span>
+            <span class="kpi-value" id="kpiPendingApps">0</span>
+          </div>
+          <div class="admin-kpi-card kpi-approved">
+            <span class="kpi-label">Approved</span>
+            <span class="kpi-value" id="kpiApprovedApps">0</span>
+          </div>
+          <div class="admin-kpi-card kpi-rejected">
+            <span class="kpi-label">Rejected</span>
+            <span class="kpi-value" id="kpiRejectedApps">0</span>
+          </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="admin-controls-bar">
+          <div class="admin-search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="adminSearchInput" class="admin-search-input" placeholder="Search by student name, roll no, or email...">
+          </div>
+
+          <div class="admin-filter-group">
+            <select id="adminClubFilter" class="form-select admin-select">
+              <option value="All">All Clubs</option>
+            </select>
+
+            <div class="admin-status-tabs" id="adminStatusTabs">
+              <button type="button" class="status-tab active" data-status="All">All</button>
+              <button type="button" class="status-tab" data-status="Pending">Pending</button>
+              <button type="button" class="status-tab" data-status="Approved">Approved</button>
+              <button type="button" class="status-tab" data-status="Rejected">Rejected</button>
+            </div>
+
+            <button type="button" class="btn btn-secondary admin-refresh-btn" id="adminRefreshBtn" onclick="loadAdminRegistrations()" title="Refresh applications">
+              🔄 Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Registrations Table / List Container -->
+        <div class="admin-table-container">
+          <table class="admin-table" id="adminTable">
+            <thead>
+              <tr>
+                <th>Applicant</th>
+                <th>Roll / Reg No</th>
+                <th>Club</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div class="admin-empty-state" id="adminEmptyState" style="display: none;">
+            <span class="admin-empty-icon">📭</span>
+            <h4>No applications found</h4>
+            <p>Try adjusting your search or status filter.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer admin-modal-footer">
+        <span class="admin-footer-note">⚡ Real-time SQLite Database Sync</span>
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal()">Close</button>
       </div>
 
     </div>

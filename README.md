@@ -1,68 +1,27 @@
-# 🎓 Campus Club Explorer (CampusConnect)
+# 🎓 CampusConnect - Full-Stack Campus Club Explorer
 
-> A modern, clean, and responsive student club discovery portal designed for universities and colleges. Built with pure **HTML5**, **Vanilla CSS3**, and **beginner-friendly JavaScript (DOM Manipulation)**.
+> A modern, responsive student club discovery and registration portal built with a **Node.js & Express REST API backend**, **SQLite database**, and vanilla **HTML5 / CSS3 / JavaScript** frontend.
 
 ---
 
 ## 📌 Project Overview
 
-**Campus Club Explorer** (branded as **CampusConnect**) solves a common problem on college campuses: helping freshmen and undergraduate students discover extracurricular clubs, student chapters, and technical societies. 
-
-Students can explore active campus organizations across different domains (Technology, Sports, Arts, Photography, Entrepreneurship, Social Service), search dynamically, view comprehensive club schedules and activities, and submit membership registration applications.
-
-This project was built specifically to showcase clean frontend fundamentals for academic evaluation and portfolio presentation.
-
----
-
-## ✨ Features
-
-- **🎨 Modern & Premium UI/UX:**
-  - Curated color palette with clean slate backgrounds and vibrant blue/purple accents.
-  - Modern typography using Google's *Plus Jakarta Sans*.
-  - Rounded cards with multi-layered shadows and smooth CSS hover animations.
-  - Fully responsive across desktop, tablet, and mobile screens.
-
-- **🔍 Live Search & Multi-Filter:**
-  - Real-time search bar that filters clubs by name or category as you type.
-  - 7 domain category filters: *All Clubs, Technology, Sports, Arts & Culture, Photography, Entrepreneurship, and Social Service*.
-  - Search and category filters work concurrently using basic loops and conditionals.
-  - User-friendly empty state with a "Reset All Filters" action when no matches are found.
-
-- **📋 Dynamic Club Cards:**
-  - 8 distinct sample clubs rendered dynamically from JavaScript objects:
-    1. **ACM Student Chapter** (Technology)
-    2. **Google Developer Student Club** (Technology)
-    3. **Robotics Club** (Technology)
-    4. **Sports Club** (Sports)
-    5. **Music & Dance Club** (Arts & Culture)
-    6. **Photography Club** (Photography)
-    7. **Entrepreneurship Cell** (Entrepreneurship)
-    8. **NSS Club** (Social Service)
-  - Each card shows category tags, member statistics, descriptions, and action triggers.
-
-- **🪟 Interactive Modals:**
-  - **Club Details Modal:** Displays full description, meeting times, campus locations, member counts, and a list of key annual activities.
-  - **Registration Form Modal:** Allows students to apply to any club with input validation (name, college email check with `@`, registration number, and club choice).
-  - Can be dismissed via close buttons, backdrop click, or pressing the `Escape` key.
-
-- **📱 Mobile Friendly Navigation:**
-  - Sticky navigation bar with mobile hamburger menu toggle.
+**CampusConnect** bridges the gap between college freshmen, undergraduate students, and university organizations. Students can:
+- Explore active campus clubs across diverse domains (Technology, Sports, Arts, Photography, Entrepreneurship, Social Service).
+- Perform live multi-filter search by club name or category.
+- View detailed club schedules, meeting venues, and annual activities.
+- Submit real membership applications with automatic duplicate check and format validation.
+- Access an interactive **Admin Applications Portal** to inspect, filter, approve, or reject student registration requests in real time.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Tech Stack & Architecture
 
-| Technology | Purpose |
-| :--- | :--- |
-| **HTML5** | Semantic structure, accessible modal dialogs, and forms |
-| **CSS3** | Vanilla styling, Flexbox, CSS Grid, custom properties (variables), media queries, and animations |
-| **JavaScript (ES6 Basics)** | DOM selection, event listeners, dynamic card generation, filtering, and form validation |
-
-> **Note for Evaluators:** This project strictly uses only core fundamentals:
-> - **NO** external UI frameworks (No Tailwind, No Bootstrap)
-> - **NO** heavy JavaScript libraries or frameworks (No React, Vue, or Angular)
-> - **NO** complex asynchronous patterns or advanced array iterators (No `filter()`, `map()`, `reduce()`, or `async/await`)
-> - **Pure standard DOM manipulation** utilizing `for` loops, `if-else` branches, and `.innerHTML`
+| Layer | Technologies | Responsibilities |
+| :--- | :--- | :--- |
+| **Frontend** | HTML5, Vanilla CSS3, JavaScript (Fetch API & DOM) | Responsive UI, dynamic card rendering, multi-modal dialogs, real-time search, admin dashboard |
+| **Backend** | Node.js (v24), Express 5, CORS, Dotenv | RESTful API routing, input validation, status state transitions, static file serving |
+| **Database** | SQLite (`node:sqlite` Native Engine) | Persistent storage for `clubs` and `registrations`, WAL journaling, relational integrity |
 
 ---
 
@@ -70,55 +29,116 @@ This project was built specifically to showcase clean frontend fundamentals for 
 
 ```text
 Campus Club Explorer/
-├── index.html     # Semantic HTML5 markup, navigation, hero, modals & footer
-├── style.css      # Custom styling, color system, card layouts & media queries
-├── script.js      # Club data array, filtering logic, modal & form handlers
-└── README.md      # Project documentation
+├── server/
+│   ├── config/
+│   │   └── db.js                 # SQLite database initialization & auto-seeding
+│   ├── controllers/
+│   │   ├── clubController.js     # Club CRUD & filtering logic
+│   │   ├── registrationController.js # Membership applications & approval logic
+│   │   └── statsController.js    # Aggregated system metrics
+│   ├── routes/
+│   │   ├── clubRoutes.js         # /api/clubs endpoints
+│   │   ├── registrationRoutes.js # /api/registrations endpoints
+│   │   └── statsRoutes.js        # /api/stats endpoint
+│   ├── seeds/
+│   │   ├── clubsData.js          # Initial 8 campus clubs & demo applications
+│   │   └── seed.js               # Standalone database reset & seed script
+│   ├── data/
+│   │   └── campus.db             # Persistent SQLite database file
+│   └── server.js                 # Express server entry point & static file hosting
+├── index.html                    # Single-page web app with navigation, hero & modals
+├── style.css                     # Custom CSS with design tokens, responsive grid & animations
+├── script.js                     # Frontend API client, DOM manipulation & admin portal
+├── package.json                  # NPM dependencies and development scripts
+├── .env.example                  # Environment configuration template
+└── README.md                     # Documentation
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start Guide
 
-No installation, build tools, or local server setups are required!
+### 1. Prerequisites
+Ensure you have **Node.js** (v20+ or v24 recommended) and **npm** installed:
+```bash
+node -v
+npm -v
+```
 
-### Method 1: Direct Browser Launch
-1. Clone or download this repository:
-   ```bash
-   git clone https://github.com/084divyanshuraj/Campus-Club-Explorer-UI-only-.git
-   ```
-2. Navigate to the project directory.
-3. Double-click **`index.html`** or right-click and select **Open with > Google Chrome** (or your browser of choice).
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-### Method 2: VS Code Live Server (Optional)
-1. Open the project folder in **Visual Studio Code**.
-2. Install the **Live Server** extension.
-3. Right-click on `index.html` and click **"Open with Live Server"**.
+### 3. Run Database Seeder (Optional)
+The database automatically initializes and seeds on first launch. To manually reset and re-seed clean data anytime:
+```bash
+npm run seed
+```
 
----
+### 4. Start the Application
+Start the server in standard production mode:
+```bash
+npm start
+```
 
-## 💡 JavaScript Concepts Implemented
+Or run with automatic hot-reloading during development:
+```bash
+npm run dev
+```
 
-This project is tailored for academic presentation. Here are the core concepts applied:
-
-1. **Arrays & Objects:** Storing structured club information in an array of simple key-value objects.
-2. **Standard `for` Loops:** Iterating over the array to generate dynamic HTML markup and parse DOM node lists.
-3. **`if-else` Logic:** Performing category filtering, search keyword comparisons, and form validation.
-4. **DOM Selection:** Retrieving page elements with `document.getElementById()` and `document.querySelector()`.
-5. **DOM Manipulation:** Updating content with `.innerHTML` and `.textContent`, and controlling visibility via `classList.add()`, `classList.remove()`, and `classList.toggle()`.
-6. **String Manipulation:** Using `.toLowerCase()` and `.includes()` for case-insensitive search queries.
-7. **Form Validation:** Validating user input and ensuring email integrity before showing success alerts.
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check the issues page or submit a pull request if you'd like to expand club categories or add features.
-
----
-
-
+Open your browser and navigate to:
+```text
+http://localhost:5000
+```
 
 ---
 
+## 📡 REST API Documentation
 
+### 🏛️ Clubs Endpoints (`/api/clubs`)
+
+| Method | Endpoint | Query / Body | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/clubs` | `?search=...&category=...` | Retrieve all clubs matching optional search keywords or category filters |
+| `GET` | `/api/clubs/:id` | None | Get detailed record for a specific club |
+| `POST` | `/api/clubs` | JSON body | Create a new campus organization |
+| `PUT` | `/api/clubs/:id` | JSON body | Update an existing club's info or schedule |
+| `DELETE` | `/api/clubs/:id` | None | Remove a club from the directory |
+
+### 📝 Registrations Endpoints (`/api/registrations`)
+
+| Method | Endpoint | Query / Body | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/registrations` | `?club=...&status=...&search=...` | Retrieve applications with filter criteria |
+| `POST` | `/api/registrations` | `{ studentName, studentEmail, regNumber, clubName }` | Submit a membership application (prevents duplicate applications) |
+| `PATCH` | `/api/registrations/:id/status` | `{ status: "Approved" \| "Rejected" \| "Pending" }` | Updates application review status & auto-syncs club member count |
+| `DELETE` | `/api/registrations/:id` | None | Delete an application record |
+
+### 📊 System Metrics (`/api/stats`)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/stats` | Returns total clubs, total student members, and registration breakdown by status |
+
+---
+
+## 🌟 Key Full-Stack Features
+
+1. **Native SQLite Persistence:** Zero-configuration local database utilizing Node 24's native `node:sqlite` engine.
+2. **Real-time Member Count Sync:** Approving an application automatically increments that club's active member count in the database and updates UI cards in real time.
+3. **Duplicate Application Prevention:** Prevents a student with the same college email from applying multiple times to the same club.
+4. **Interactive Admin Portal:** Accessible directly from the top navigation ("Applications" badge). Filter by status (Pending, Approved, Rejected) or club name, search applicants, and perform 1-click approvals/rejections.
+5. **Dynamic Dashboard Metrics:** Hero statistics and admin KPI cards reflect live counts directly computed from database tables.
+
+---
+
+
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+
+<p align="center">
+  <b>Made with ❤️ for students, by students.</b><br>
+  <sub>CampusConnect &bull; 2026</sub>
+</p>

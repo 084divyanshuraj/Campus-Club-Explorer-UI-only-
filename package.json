@@ -1,0 +1,34 @@
+{
+  "name": "campus-club-explorer",
+  "version": "1.0.0",
+  "description": "Full-stack Campus Club Explorer web portal with Node.js, Express, SQLite REST API backend and responsive frontend.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "seed": "node server/seeds/seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/084divyanshuraj/Campus-Club-Explorer-UI-only-.git"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "sqlite",
+    "rest-api",
+    "campus-clubs",
+    "fullstack"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
