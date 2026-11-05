@@ -1,12 +1,184 @@
 /* ==========================================================================
    CampusConnect - Campus Club Explorer
-   Frontend Application Script (Full REST API Backend Integration)
+   Frontend Application Script (Full REST API Backend with Zero-Setup Fallback)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. GLOBAL STATE & DATA STORAGE
-   Clubs and stats are loaded asynchronously from the Express REST API.
+   1. DEFAULT FALLBACK DATA (For Vercel / Standalone Deployment without server)
    -------------------------------------------------------------------------- */
+const DEFAULT_CLUBS = [
+  {
+    id: 1,
+    name: "ACM Student Chapter",
+    category: "Technology",
+    categoryClass: "cat-tech",
+    icon: "💻",
+    members: 280,
+    schedule: "Every Wednesday, 5:00 PM • CS Seminar Hall",
+    description: "The premier computer science society promoting technical expertise, coding contests, and research papers.",
+    fullDescription: "ACM Student Chapter is dedicated to advancing computing as a science and profession. We organize national hackathons, competitive programming bootcamps, algorithmic problem-solving workshops, and guest lectures from industry pioneers.",
+    activities: [
+      "CodeSprint 24-Hour Annual Hackathon",
+      "Data Structures & Algorithms Bootcamp",
+      "Weekly LeetCode Challenges & Mentorship",
+      "Alumni Tech Talks & Mock Interviews"
+    ]
+  },
+  {
+    id: 2,
+    name: "Google Developer Student Club",
+    category: "Technology",
+    categoryClass: "cat-tech",
+    icon: "🌐",
+    members: 340,
+    schedule: "Every Friday, 4:30 PM • Innovation Lab 3",
+    description: "Community-driven group bridging the gap between theory and practical industry technology using modern developer tools.",
+    fullDescription: "GDSC is a university-based community group supported by Google Developers. From mobile and web development to machine learning and cloud architecture, our members build real-world software solutions for local communities.",
+    activities: [
+      "Global Solution Challenge Hackathon",
+      "Google Cloud Study Jams",
+      "Flutter & Android App Development",
+      "Open Source Web Development Workshops"
+    ]
+  },
+  {
+    id: 3,
+    name: "Robotics Club",
+    category: "Technology",
+    categoryClass: "cat-tech",
+    icon: "🤖",
+    members: 190,
+    schedule: "Tuesday & Thursday, 5:30 PM • Makerspace Workshop",
+    description: "Hands-on engineering club building autonomous rovers, drones, IoT devices, and combat robots.",
+    fullDescription: "The Robotics Club is where mechanical design meets embedded programming. Members gain hands-on experience with Arduino, Raspberry Pi, 3D printing, sensor integration, and computer vision while competing in national robotics arenas.",
+    activities: [
+      "RoboWars Combat Championship",
+      "Autonomous Line Follower Challenge",
+      "Quadcopter Drone Design Workshop",
+      "Embedded C and Arduino Masterclasses"
+    ]
+  },
+  {
+    id: 4,
+    name: "Sports Club",
+    category: "Sports",
+    categoryClass: "cat-sports",
+    icon: "⚽",
+    members: 420,
+    schedule: "Mon - Sat, 6:00 AM & 5:00 PM • University Sports Complex",
+    description: "Promoting physical fitness, team spirit, and athletic excellence through inter-college tournaments.",
+    fullDescription: "The Sports Club coordinates university athletics, intramural leagues, fitness conditioning, and inter-collegiate tournaments in cricket, football, basketball, badminton, and athletics. Everyone from casual players to seasoned athletes is welcome.",
+    activities: [
+      "Annual Inter-Department Sports Cup",
+      "Campus 5K Marathon for Fitness",
+      "Intramural Basketball League",
+      "Weekend Fitness Conditioning & Yoga"
+    ]
+  },
+  {
+    id: 5,
+    name: "Music & Dance Club",
+    category: "Arts & Culture",
+    categoryClass: "cat-arts",
+    icon: "🎭",
+    members: 260,
+    schedule: "Mon, Wed & Fri, 5:00 PM • Cultural Auditorium",
+    description: "Express your rhythm and melody through campus concerts, dance choreography, and stage battles.",
+    fullDescription: "The Music & Dance Club is the vibrant cultural heartbeat of the university. We provide a collaborative stage for vocalists, instrumentalists, classical dancers, and modern street crews to rehearse, perform at college fests, and compete across India.",
+    activities: [
+      "Annual Battle of the Campus Bands",
+      "Acoustic Unplugged Evening Sessions",
+      "Western & Classical Dance Competitions",
+      "Annual Spring Cultural Night Performance"
+    ]
+  },
+  {
+    id: 6,
+    name: "Photography Club",
+    category: "Photography",
+    categoryClass: "cat-photo",
+    icon: "📷",
+    members: 175,
+    schedule: "Every Saturday, 10:00 AM • Media Lab & Outdoors",
+    description: "Capturing moments through visual storytelling, photowalks, portraiture, and digital editing.",
+    fullDescription: "The Photography Club nurtures the art of visual storytelling. Whether you shoot with a professional DSLR or a smartphone, we explore manual camera exposure, lighting theory, post-processing in Lightroom, and outdoor city photo-walk expeditions.",
+    activities: [
+      "Golden Hour City Photowalks",
+      "Adobe Lightroom Photo Editing Masterclasses",
+      "Annual University Photography Exhibition",
+      "Official Campus Event Coverage Team"
+    ]
+  },
+  {
+    id: 7,
+    name: "Entrepreneurship Cell",
+    category: "Entrepreneurship",
+    categoryClass: "cat-biz",
+    icon: "💡",
+    members: 215,
+    schedule: "Every Tuesday, 5:00 PM • Incubation Center Room 102",
+    description: "Empowering future founders through pitch competitions, seed funding mentorship, and startup summits.",
+    fullDescription: "E-Cell fosters the spirit of innovation and enterprise on campus. We help students transform ideas into viable startups by providing access to venture capitalists, angel investors, startup incubators, patent support, and pitch decks.",
+    activities: [
+      "Annual Campus Pitch Battle with Seed Grants",
+      "Founders Talk Series with Startup CEOs",
+      "Annual E-Summit & Business Plan Competition",
+      "Product Design & Business Model Canvas Sprints"
+    ]
+  },
+  {
+    id: 8,
+    name: "NSS Club",
+    category: "Social Service",
+    categoryClass: "cat-social",
+    icon: "🤝",
+    members: 380,
+    schedule: "Every Sunday, 9:00 AM • Community Outreach Hall",
+    description: "Dedicated to community welfare, rural education drives, environmental conservation, and blood camps.",
+    fullDescription: "The National Service Scheme (NSS) unit connects students with meaningful civic responsibility. We organize blood donation camps, digital literacy drives in adopted villages, tree plantation campaigns, and disaster relief aid.",
+    activities: [
+      "Mega Annual Blood Donation Drive",
+      "Clean Campus, Green Campus Plantation Drive",
+      "Rural School Literacy & Computer Tutoring",
+      "Public Health, Hygiene & Road Safety Drives"
+    ]
+  }
+];
+
+const DEFAULT_REGISTRATIONS = [
+  {
+    id: 1,
+    student_name: "Aarav Sharma",
+    student_email: "aarav.sharma@campus.edu",
+    reg_number: "2024CS1042",
+    club_name: "ACM Student Chapter",
+    status: "Approved",
+    created_at: new Date(Date.now() - 3 * 86400000).toISOString()
+  },
+  {
+    id: 2,
+    student_name: "Priya Nair",
+    student_email: "priya.nair@campus.edu",
+    reg_number: "2024EC2105",
+    club_name: "Robotics Club",
+    status: "Pending",
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString()
+  },
+  {
+    id: 3,
+    student_name: "Rohan Verma",
+    student_email: "rohan.verma@campus.edu",
+    reg_number: "2024ME3319",
+    club_name: "Sports Club",
+    status: "Pending",
+    created_at: new Date(Date.now() - 4 * 3600000).toISOString()
+  }
+];
+
+/* --------------------------------------------------------------------------
+   2. GLOBAL STATE & DATA STORAGE
+   -------------------------------------------------------------------------- */
+let isBackendOnline = false;
 let clubs = [];
 let currentCategory = "All Clubs";
 let currentSearchTerm = "";
@@ -18,9 +190,8 @@ let adminClubFilterValue = "All";
 let adminSearchTerm = "";
 
 /* --------------------------------------------------------------------------
-   2. DOM ELEMENT REFERENCES
+   3. DOM ELEMENT REFERENCES
    -------------------------------------------------------------------------- */
-// Club Catalog & Search
 let clubsGrid = document.getElementById("clubsGrid");
 let resultsCount = document.getElementById("resultsCount");
 let noResultsMessage = document.getElementById("noResultsMessage");
@@ -76,91 +247,133 @@ let navLinks = document.getElementById("navLinks");
 
 
 /* --------------------------------------------------------------------------
-   3. API CLIENT: FETCH CLUBS FROM BACKEND
-   Retrieves club list from GET /api/clubs
+   4. LOCALSTORAGE HELPERS (For Standalone / Vercel Mode)
+   -------------------------------------------------------------------------- */
+function getLocalRegistrations() {
+  const stored = localStorage.getItem("campus_registrations");
+  if (!stored) {
+    localStorage.setItem("campus_registrations", JSON.stringify(DEFAULT_REGISTRATIONS));
+    return [...DEFAULT_REGISTRATIONS];
+  }
+  try {
+    return JSON.parse(stored);
+  } catch (e) {
+    return [...DEFAULT_REGISTRATIONS];
+  }
+}
+
+function saveLocalRegistrations(list) {
+  localStorage.setItem("campus_registrations", JSON.stringify(list));
+}
+
+function getLocalClubs() {
+  const stored = localStorage.getItem("campus_clubs");
+  if (!stored) {
+    localStorage.setItem("campus_clubs", JSON.stringify(DEFAULT_CLUBS));
+    return [...DEFAULT_CLUBS];
+  }
+  try {
+    return JSON.parse(stored);
+  } catch (e) {
+    return [...DEFAULT_CLUBS];
+  }
+}
+
+function saveLocalClubs(list) {
+  localStorage.setItem("campus_clubs", JSON.stringify(list));
+}
+
+
+/* --------------------------------------------------------------------------
+   5. API CLIENT & HYBRID DATA FETCHING
+   Tries Express REST API first; seamlessly falls back to local data if on Vercel.
    -------------------------------------------------------------------------- */
 async function fetchClubs() {
   try {
-    // Show loading state if grid is currently empty
-    if (!clubsGrid.hasChildNodes() || clubs.length === 0) {
-      clubsGrid.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-          <div style="font-size: 2rem; margin-bottom: 0.5rem; animation: pulseBadge 1.5s infinite;">⚡</div>
-          <p style="font-weight: 600;">Connecting to CampusConnect Backend...</p>
-        </div>
-      `;
-    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
 
-    const response = await fetch('/api/clubs');
-    if (!response.ok) {
-      throw new Error(`Failed to load clubs (HTTP ${response.status})`);
-    }
+    const response = await fetch('/api/clubs', { signal: controller.signal });
+    clearTimeout(timeoutId);
 
-    const data = await response.json();
-    if (data.success && Array.isArray(data.data)) {
-      clubs = data.data;
-      displayClubs();
-      populateClubDropdowns();
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        isBackendOnline = true;
+        clubs = data.data;
+        displayClubs();
+        populateClubDropdowns();
+        return;
+      }
     }
+    throw new Error("Backend API responded with non-200 status.");
   } catch (error) {
-    console.error("Error fetching clubs from API:", error);
-    clubsGrid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1.5rem; background: #fff; border-radius: 12px; border: 1px solid var(--danger-border);">
-        <p style="color: var(--danger); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">⚠️ Could not connect to backend server</p>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">Make sure the Express server is running at <code>http://localhost:5000</code>.</p>
-        <button type="button" class="btn btn-secondary" style="margin-top: 1rem;" onclick="fetchClubs()">Try Again</button>
-      </div>
-    `;
+    // Graceful fallback to client / standalone mode (Vercel)
+    isBackendOnline = false;
+    console.info("⚡ Running in Vercel/Standalone mode with local persistence.");
+    clubs = getLocalClubs();
+    displayClubs();
+    populateClubDropdowns();
   }
 }
 
-/* --------------------------------------------------------------------------
-   4. API CLIENT: FETCH SYSTEM & APPLICATION STATS
-   Retrieves KPI metrics from GET /api/stats
-   -------------------------------------------------------------------------- */
 async function fetchStats() {
-  try {
-    const response = await fetch('/api/stats');
-    if (!response.ok) return;
-
-    const res = await response.json();
-    if (res.success && res.data) {
-      const { totalClubs, totalMembers, registrations } = res.data;
-
-      // Update hero counters
-      if (heroStatClubs) heroStatClubs.textContent = `${totalClubs}+`;
-      if (heroStatMembers) heroStatMembers.textContent = `${Number(totalMembers).toLocaleString()}+`;
-
-      // Update Admin badge count (pending applications)
-      if (adminBadgeCount) {
-        const pending = registrations.pending || 0;
-        adminBadgeCount.textContent = pending;
-        if (pending > 0) {
-          adminBadgeCount.classList.add("has-pending");
-        } else {
-          adminBadgeCount.classList.remove("has-pending");
+  if (isBackendOnline) {
+    try {
+      const response = await fetch('/api/stats');
+      if (response.ok) {
+        const res = await response.json();
+        if (res.success && res.data) {
+          applyStatsToUI(res.data.totalClubs, res.data.totalMembers, res.data.registrations);
+          return;
         }
       }
-
-      // Update Admin KPI cards
-      if (kpiTotalApps) kpiTotalApps.textContent = registrations.total || 0;
-      if (kpiPendingApps) kpiPendingApps.textContent = registrations.pending || 0;
-      if (kpiApprovedApps) kpiApprovedApps.textContent = registrations.approved || 0;
-      if (kpiRejectedApps) kpiRejectedApps.textContent = registrations.rejected || 0;
+    } catch (e) {
+      console.warn("Could not sync stats with API, computing locally.");
     }
-  } catch (error) {
-    console.warn("Could not sync stats with API:", error);
   }
+
+  // Standalone / Vercel calculation
+  const totalClubs = clubs.length;
+  let totalMembers = 0;
+  for (let i = 0; i < clubs.length; i++) {
+    totalMembers += (clubs[i].members || 0);
+  }
+
+  const regs = getLocalRegistrations();
+  const counts = {
+    total: regs.length,
+    pending: regs.filter(r => r.status === "Pending").length,
+    approved: regs.filter(r => r.status === "Approved").length,
+    rejected: regs.filter(r => r.status === "Rejected").length
+  };
+
+  applyStatsToUI(totalClubs, totalMembers, counts);
 }
 
+function applyStatsToUI(totalClubs, totalMembers, regCounts) {
+  if (heroStatClubs) heroStatClubs.textContent = `${totalClubs}+`;
+  if (heroStatMembers) heroStatMembers.textContent = `${Number(totalMembers).toLocaleString()}+`;
+
+  const pending = regCounts.pending || 0;
+  if (adminBadgeCount) {
+    adminBadgeCount.textContent = pending;
+    if (pending > 0) adminBadgeCount.classList.add("has-pending");
+    else adminBadgeCount.classList.remove("has-pending");
+  }
+
+  if (kpiTotalApps) kpiTotalApps.textContent = regCounts.total || 0;
+  if (kpiPendingApps) kpiPendingApps.textContent = pending;
+  if (kpiApprovedApps) kpiApprovedApps.textContent = regCounts.approved || 0;
+  if (kpiRejectedApps) kpiRejectedApps.textContent = regCounts.rejected || 0;
+}
+
+
 /* --------------------------------------------------------------------------
-   5. FUNCTION: POPULATE DROPDOWNS DYNAMICALLY
-   Keeps the join form dropdown & admin filter aligned with live clubs.
+   6. FUNCTION: POPULATE DROPDOWNS DYNAMICALLY
    -------------------------------------------------------------------------- */
 function populateClubDropdowns() {
   if (!clubSelectDropdown) return;
-
-  // Preserve any currently selected value
   const prevVal = clubSelectDropdown.value;
 
   let optionsHtml = '<option value="">-- Choose a Campus Club --</option>';
@@ -184,8 +397,7 @@ function populateClubDropdowns() {
 
 
 /* --------------------------------------------------------------------------
-   6. FUNCTION: DISPLAY CLUB CARDS
-   Filters live clubs by selected category and active search term.
+   7. FUNCTION: DISPLAY CLUB CARDS
    -------------------------------------------------------------------------- */
 function displayClubs() {
   let cardsHtml = "";
@@ -194,22 +406,14 @@ function displayClubs() {
   for (let i = 0; i < clubs.length; i++) {
     let club = clubs[i];
 
-    // Category matching
-    let matchesCategory = false;
-    if (currentCategory === "All Clubs" || club.category === currentCategory) {
-      matchesCategory = true;
-    }
+    let matchesCategory = (currentCategory === "All Clubs" || club.category === currentCategory);
 
-    // Search term matching
-    let matchesSearch = false;
     let nameLower = club.name.toLowerCase();
     let categoryLower = club.category.toLowerCase();
     let descLower = (club.description || "").toLowerCase();
     let searchLower = currentSearchTerm.toLowerCase().trim();
 
-    if (searchLower === "" || nameLower.includes(searchLower) || categoryLower.includes(searchLower) || descLower.includes(searchLower)) {
-      matchesSearch = true;
-    }
+    let matchesSearch = (searchLower === "" || nameLower.includes(searchLower) || categoryLower.includes(searchLower) || descLower.includes(searchLower));
 
     if (matchesCategory && matchesSearch) {
       matchingCount++;
@@ -237,13 +441,9 @@ function displayClubs() {
     }
   }
 
-  // Inject cards into DOM
   clubsGrid.innerHTML = cardsHtml;
-
-  // Update results counter
   resultsCount.textContent = matchingCount + (matchingCount === 1 ? " club found" : " clubs found");
 
-  // Show or hide empty state
   if (matchingCount === 0) {
     noResultsMessage.style.display = "block";
     clubsGrid.style.display = "none";
@@ -253,8 +453,9 @@ function displayClubs() {
   }
 }
 
+
 /* --------------------------------------------------------------------------
-   7. FILTERING & SEARCH HANDLERS
+   8. FILTERING & SEARCH HANDLERS
    -------------------------------------------------------------------------- */
 function filterByCategory(categoryName) {
   currentCategory = categoryName;
@@ -277,14 +478,12 @@ function filterByCategory(categoryName) {
 function handleSearchInput(event) {
   currentSearchTerm = event.target.value;
 
-  // Sync both search bars
   if (event.target === clubSearchInput && heroSearchInput) {
     heroSearchInput.value = currentSearchTerm;
   } else if (event.target === heroSearchInput && clubSearchInput) {
     clubSearchInput.value = currentSearchTerm;
   }
 
-  // Toggle clear button
   if (clearSearchBtn) {
     clearSearchBtn.style.display = currentSearchTerm.trim() !== "" ? "block" : "none";
   }
@@ -328,7 +527,7 @@ function filterFromFooter(categoryName) {
 
 
 /* --------------------------------------------------------------------------
-   8. CLUB DETAILS MODAL
+   9. CLUB DETAILS MODAL
    -------------------------------------------------------------------------- */
 function openDetailModal(clubId) {
   let selectedClub = null;
@@ -383,7 +582,7 @@ function switchToJoinFromDetails() {
 
 
 /* --------------------------------------------------------------------------
-   9. JOIN CLUB REGISTRATION MODAL & SUBMISSION (POST /api/registrations)
+   10. JOIN CLUB REGISTRATION MODAL & SUBMISSION (Hybrid API + Standalone)
    -------------------------------------------------------------------------- */
 function openJoinModal(preselectedClubName) {
   formErrorAlert.style.display = "none";
@@ -437,54 +636,79 @@ async function handleJoinFormSubmit(event) {
     return;
   }
 
-  // Show loading state
   submitJoinBtn.disabled = true;
   submitJoinBtn.textContent = "Submitting Application...";
   formErrorAlert.style.display = "none";
 
-  try {
-    const response = await fetch('/api/registrations', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        studentName: nameValue,
-        studentEmail: emailValue,
-        regNumber: regValue,
-        clubName: clubValue
-      })
-    });
+  // Case A: Connected to live Express REST backend
+  if (isBackendOnline) {
+    try {
+      const response = await fetch('/api/registrations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: nameValue,
+          studentEmail: emailValue,
+          regNumber: regValue,
+          clubName: clubValue
+        })
+      });
 
-    const result = await response.json();
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Failed to submit registration.");
+      }
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || "Failed to submit registration.");
+      formSuccessMessage.textContent = result.message;
+      completeRegistrationSuccess();
+      return;
+    } catch (err) {
+      console.warn("Backend submit failed, trying fallback:", err);
     }
+  }
 
-    // Success response
-    formErrorAlert.style.display = "none";
-    formSuccessMessage.textContent = result.message;
-    formSuccessAlert.style.display = "flex";
-    joinClubForm.style.display = "none";
-    joinClubForm.reset();
+  // Case B: Standalone Vercel / Client Fallback Mode
+  const localRegs = getLocalRegistrations();
+  const exists = localRegs.some(r => r.student_email.toLowerCase() === emailValue.toLowerCase() && r.club_name === clubValue);
 
-    // Refresh KPI metrics & live club data
-    fetchStats();
-    fetchClubs();
-
-  } catch (err) {
-    console.error("Registration error:", err);
-    formErrorMessage.textContent = err.message || "An error occurred while submitting. Please try again.";
+  if (exists) {
+    formErrorMessage.textContent = `An application for ${clubValue} using ${emailValue} already exists.`;
     formErrorAlert.style.display = "flex";
     submitJoinBtn.disabled = false;
     submitJoinBtn.textContent = "Submit Application";
+    return;
   }
+
+  const newApp = {
+    id: Date.now(),
+    student_name: nameValue,
+    student_email: emailValue,
+    reg_number: regValue,
+    club_name: clubValue,
+    status: "Pending",
+    created_at: new Date().toISOString()
+  };
+
+  localRegs.unshift(newApp);
+  saveLocalRegistrations(localRegs);
+
+  formSuccessMessage.textContent = `Congratulations ${nameValue}! Your application to ${clubValue} has been submitted for review.`;
+  completeRegistrationSuccess();
+}
+
+function completeRegistrationSuccess() {
+  formErrorAlert.style.display = "none";
+  formSuccessAlert.style.display = "flex";
+  joinClubForm.style.display = "none";
+  joinClubForm.reset();
+
+  fetchStats();
+  if (isBackendOnline) fetchClubs();
 }
 
 
 /* --------------------------------------------------------------------------
-   10. ADMIN APPLICATIONS MANAGEMENT PORTAL
+   11. ADMIN APPLICATIONS MANAGEMENT PORTAL (Hybrid API + Standalone)
    -------------------------------------------------------------------------- */
 function openAdminModal() {
   adminModal.classList.add("active");
@@ -512,158 +736,196 @@ function showAdminToast(message, type = "success") {
 async function loadAdminRegistrations() {
   if (!adminTableBody) return;
 
-  adminTableBody.innerHTML = `
-    <tr>
-      <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
-        Loading applications from SQLite database...
-      </td>
-    </tr>
-  `;
+  // Case A: Live Backend
+  if (isBackendOnline) {
+    try {
+      const params = new URLSearchParams();
+      if (adminStatusFilter !== "All") params.append("status", adminStatusFilter);
+      if (adminClubFilterValue !== "All") params.append("club", adminClubFilterValue);
+      if (adminSearchTerm.trim() !== "") params.append("search", adminSearchTerm.trim());
 
-  try {
-    const params = new URLSearchParams();
-    if (adminStatusFilter !== "All") params.append("status", adminStatusFilter);
-    if (adminClubFilterValue !== "All") params.append("club", adminClubFilterValue);
-    if (adminSearchTerm.trim() !== "") params.append("search", adminSearchTerm.trim());
-
-    const response = await fetch(`/api/registrations?${params.toString()}`);
-    if (!response.ok) throw new Error("Failed to fetch applications.");
-
-    const res = await response.json();
-    const applications = res.data || [];
-
-    // Update KPI counters
-    if (res.counts) {
-      if (kpiTotalApps) kpiTotalApps.textContent = res.counts.total;
-      if (kpiPendingApps) kpiPendingApps.textContent = res.counts.pending;
-      if (kpiApprovedApps) kpiApprovedApps.textContent = res.counts.approved;
-      if (kpiRejectedApps) kpiRejectedApps.textContent = res.counts.rejected;
-      if (adminBadgeCount) {
-        adminBadgeCount.textContent = res.counts.pending;
-        if (res.counts.pending > 0) adminBadgeCount.classList.add("has-pending");
-        else adminBadgeCount.classList.remove("has-pending");
+      const response = await fetch(`/api/registrations?${params.toString()}`);
+      if (response.ok) {
+        const res = await response.json();
+        renderAdminApplications(res.data || []);
+        if (res.counts) applyStatsToUI(clubs.length, clubs.reduce((acc, c) => acc + c.members, 0), res.counts);
+        return;
       }
+    } catch (error) {
+      console.warn("API request failed, loading locally:", error);
     }
+  }
 
-    if (applications.length === 0) {
-      adminTableBody.innerHTML = "";
-      adminEmptyState.style.display = "block";
-      document.getElementById("adminTable").style.display = "none";
-      return;
-    }
+  // Case B: Standalone / Vercel Local Fallback
+  let localApps = getLocalRegistrations();
 
-    adminEmptyState.style.display = "none";
-    document.getElementById("adminTable").style.display = "table";
+  if (adminClubFilterValue !== "All") {
+    localApps = localApps.filter(a => a.club_name === adminClubFilterValue);
+  }
+  if (adminStatusFilter !== "All") {
+    localApps = localApps.filter(a => a.status === adminStatusFilter);
+  }
+  if (adminSearchTerm.trim() !== "") {
+    const term = adminSearchTerm.toLowerCase().trim();
+    localApps = localApps.filter(a =>
+      a.student_name.toLowerCase().includes(term) ||
+      a.reg_number.toLowerCase().includes(term) ||
+      a.student_email.toLowerCase().includes(term)
+    );
+  }
 
-    let rowsHtml = "";
-    for (let i = 0; i < applications.length; i++) {
-      const app = applications[i];
-      const statusClass = app.status === "Approved" ? "status-approved" : app.status === "Rejected" ? "status-rejected" : "status-pending";
-      const statusIcon = app.status === "Approved" ? "✓" : app.status === "Rejected" ? "✕" : "⏳";
-      
-      const dateFormatted = new Date(app.created_at).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric"
-      });
+  renderAdminApplications(localApps);
+}
 
-      // Action buttons based on current status
-      let actionButtons = `
-        <div class="action-btns">
-          ${app.status !== 'Approved' ? `<button type="button" class="btn-action btn-approve" onclick="updateRegistrationStatus(${app.id}, 'Approved')" title="Approve Application">✓ Approve</button>` : ''}
-          ${app.status !== 'Rejected' ? `<button type="button" class="btn-action btn-reject" onclick="updateRegistrationStatus(${app.id}, 'Rejected')" title="Reject Application">✕ Reject</button>` : ''}
-          <button type="button" class="btn-action btn-delete" onclick="deleteRegistration(${app.id})" title="Delete Application">🗑</button>
-        </div>
-      `;
+function renderAdminApplications(applications) {
+  if (applications.length === 0) {
+    adminTableBody.innerHTML = "";
+    adminEmptyState.style.display = "block";
+    document.getElementById("adminTable").style.display = "none";
+    return;
+  }
 
-      rowsHtml += `
-        <tr>
-          <td>
-            <div class="applicant-cell">
-              <span class="applicant-name">${app.student_name}</span>
-              <span class="applicant-email">${app.student_email}</span>
-            </div>
-          </td>
-          <td><span class="reg-badge">${app.reg_number}</span></td>
-          <td><strong>${app.club_name}</strong></td>
-          <td style="white-space: nowrap; color: var(--text-muted); font-size: 0.82rem;">${dateFormatted}</td>
-          <td>
-            <span class="status-pill ${statusClass}">
-              <span>${statusIcon}</span> ${app.status}
-            </span>
-          </td>
-          <td>${actionButtons}</td>
-        </tr>
-      `;
-    }
+  adminEmptyState.style.display = "none";
+  document.getElementById("adminTable").style.display = "table";
 
-    adminTableBody.innerHTML = rowsHtml;
+  let rowsHtml = "";
+  for (let i = 0; i < applications.length; i++) {
+    const app = applications[i];
+    const statusClass = app.status === "Approved" ? "status-approved" : app.status === "Rejected" ? "status-rejected" : "status-pending";
+    const statusIcon = app.status === "Approved" ? "✓" : app.status === "Rejected" ? "✕" : "⏳";
 
-  } catch (error) {
-    console.error("Error loading registrations:", error);
-    adminTableBody.innerHTML = `
+    const dateFormatted = new Date(app.created_at).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+
+    let actionButtons = `
+      <div class="action-btns">
+        ${app.status !== 'Approved' ? `<button type="button" class="btn-action btn-approve" onclick="updateRegistrationStatus(${app.id}, 'Approved')" title="Approve Application">✓ Approve</button>` : ''}
+        ${app.status !== 'Rejected' ? `<button type="button" class="btn-action btn-reject" onclick="updateRegistrationStatus(${app.id}, 'Rejected')" title="Reject Application">✕ Reject</button>` : ''}
+        <button type="button" class="btn-action btn-delete" onclick="deleteRegistration(${app.id})" title="Delete Application">🗑</button>
+      </div>
+    `;
+
+    rowsHtml += `
       <tr>
-        <td colspan="6" style="text-align: center; padding: 2rem; color: var(--danger);">
-          Error connecting to registrations database.
+        <td>
+          <div class="applicant-cell">
+            <span class="applicant-name">${app.student_name}</span>
+            <span class="applicant-email">${app.student_email}</span>
+          </div>
         </td>
+        <td><span class="reg-badge">${app.reg_number}</span></td>
+        <td><strong>${app.club_name}</strong></td>
+        <td style="white-space: nowrap; color: var(--text-muted); font-size: 0.82rem;">${dateFormatted}</td>
+        <td>
+          <span class="status-pill ${statusClass}">
+            <span>${statusIcon}</span> ${app.status}
+          </span>
+        </td>
+        <td>${actionButtons}</td>
       </tr>
     `;
   }
+
+  adminTableBody.innerHTML = rowsHtml;
 }
 
 async function updateRegistrationStatus(id, newStatus) {
-  try {
-    const response = await fetch(`/api/registrations/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: newStatus })
-    });
+  if (isBackendOnline) {
+    try {
+      const response = await fetch(`/api/registrations/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const res = await response.json();
+      if (response.ok && res.success) {
+        showAdminToast(res.message, newStatus === "Approved" ? "success" : "info");
+        loadAdminRegistrations();
+        fetchStats();
+        fetchClubs();
+        return;
+      }
+    } catch (e) {
+      console.warn("Backend update failed, using local update.");
+    }
+  }
 
-    const res = await response.json();
-    if (!response.ok || !res.success) {
-      throw new Error(res.message || "Failed to update status.");
+  // Local fallback
+  const localRegs = getLocalRegistrations();
+  const target = localRegs.find(r => r.id === id);
+  if (target) {
+    const prevStatus = target.status;
+    target.status = newStatus;
+    saveLocalRegistrations(localRegs);
+
+    // Sync member count
+    const localClubs = getLocalClubs();
+    const club = localClubs.find(c => c.name === target.club_name);
+    if (club) {
+      if (prevStatus !== "Approved" && newStatus === "Approved") {
+        club.members += 1;
+      } else if (prevStatus === "Approved" && newStatus !== "Approved") {
+        club.members = Math.max(0, club.members - 1);
+      }
+      saveLocalClubs(localClubs);
+      clubs = localClubs;
+      displayClubs();
     }
 
-    showAdminToast(res.message, newStatus === "Approved" ? "success" : "info");
-    
-    // Refresh table, global stats & clubs to reflect member count changes
+    showAdminToast(`Application for ${target.student_name} (${target.club_name}) set to '${newStatus}'.`, newStatus === "Approved" ? "success" : "info");
     loadAdminRegistrations();
     fetchStats();
-    fetchClubs();
-
-  } catch (error) {
-    showAdminToast(error.message, "error");
   }
 }
 
 async function deleteRegistration(id) {
-  if (!confirm("Are you sure you want to delete this application record?")) {
-    return;
+  if (!confirm("Are you sure you want to delete this application record?")) return;
+
+  if (isBackendOnline) {
+    try {
+      const response = await fetch(`/api/registrations/${id}`, { method: "DELETE" });
+      const res = await response.json();
+      if (response.ok && res.success) {
+        showAdminToast(res.message, "info");
+        loadAdminRegistrations();
+        fetchStats();
+        fetchClubs();
+        return;
+      }
+    } catch (e) {
+      console.warn("Backend delete failed, using local delete.");
+    }
   }
 
-  try {
-    const response = await fetch(`/api/registrations/${id}`, {
-      method: "DELETE"
-    });
-
-    const res = await response.json();
-    if (!response.ok || !res.success) {
-      throw new Error(res.message || "Failed to delete application.");
+  // Local fallback
+  let localRegs = getLocalRegistrations();
+  const target = localRegs.find(r => r.id === id);
+  if (target) {
+    if (target.status === "Approved") {
+      const localClubs = getLocalClubs();
+      const club = localClubs.find(c => c.name === target.club_name);
+      if (club) {
+        club.members = Math.max(0, club.members - 1);
+        saveLocalClubs(localClubs);
+        clubs = localClubs;
+        displayClubs();
+      }
     }
+    localRegs = localRegs.filter(r => r.id !== id);
+    saveLocalRegistrations(localRegs);
 
-    showAdminToast(res.message, "info");
+    showAdminToast(`Application for ${target.student_name} was removed.`, "info");
     loadAdminRegistrations();
     fetchStats();
-    fetchClubs();
-
-  } catch (error) {
-    showAdminToast(error.message, "error");
   }
 }
 
 
 /* --------------------------------------------------------------------------
-   11. MOBILE NAVIGATION
+   12. MOBILE NAVIGATION
    -------------------------------------------------------------------------- */
 function toggleMobileMenu() {
   navLinks.classList.toggle("active");
@@ -677,10 +939,10 @@ function handleNavLinkClick() {
 
 
 /* --------------------------------------------------------------------------
-   12. APPLICATION INITIALIZATION & EVENT LISTENERS
+   13. APPLICATION INITIALIZATION & EVENT LISTENERS
    -------------------------------------------------------------------------- */
 function initializeApp() {
-  // 1. Initial live data fetch
+  // 1. Initial live data fetch (with automatic Vercel fallback)
   fetchClubs();
   fetchStats();
 
