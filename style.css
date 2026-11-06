@@ -1523,8 +1523,9 @@ button, input, select, textarea {
    14. Admin Applications Management Modal & Controls
    ========================================================================== */
 
-/* Navbar Admin Button & Badge */
-.nav-admin-btn {
+/* Navbar Admin Button & Student Applications Button */
+.nav-admin-btn,
+.nav-student-apps-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;

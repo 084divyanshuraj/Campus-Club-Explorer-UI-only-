@@ -802,6 +802,12 @@ function completeRegistrationSuccess() {
    11. ADMIN APPLICATIONS MANAGEMENT PORTAL (Hybrid API + Standalone)
    -------------------------------------------------------------------------- */
 function openAdminModal() {
+  // Access Control: Only allow logged-in Admin accounts
+  if (!currentUser || currentUser.role !== "admin") {
+    openLoginModal("admin", "Admin access required. Please sign in as an Administrator to view and manage student applications.");
+    return;
+  }
+
   const modal = adminModal || document.getElementById("adminModal");
   if (modal) {
     modal.classList.add("active");
@@ -1049,7 +1055,7 @@ function updateAuthUI() {
     if (navSignInBtn) navSignInBtn.style.display = "inline-flex";
     if (navUserPill) navUserPill.style.display = "none";
     if (navStudentAppsBtn) navStudentAppsBtn.style.display = "none";
-    if (navAdminBtn) navAdminBtn.style.display = "inline-flex";
+    if (navAdminBtn) navAdminBtn.style.display = "none";
   }
 }
 
@@ -1385,6 +1391,8 @@ function handleLogout() {
   const prevName = currentUser ? currentUser.name : "User";
   currentUser = null;
   localStorage.removeItem("campus_auth_user");
+  closeAdminModal();
+  closeStudentAppsModal();
   updateAuthUI();
   showAdminToast(`Signed out successfully. See you soon, ${prevName}!`, "info");
 }
@@ -1394,8 +1402,14 @@ function handleLogout() {
    13. STUDENT DASHBOARD / MY APPLICATIONS MODAL
    -------------------------------------------------------------------------- */
 async function openStudentAppsModal() {
+  // Guard: Only allow logged-in students
+  if (!currentUser || currentUser.role !== "student") {
+    openLoginModal("student", "Please sign in with your student account to view your club applications.");
+    return;
+  }
+
   const modal = studentAppsModal || document.getElementById("studentAppsModal");
-  if (!modal || !currentUser) return;
+  if (!modal) return;
 
   modal.classList.add("active");
   modal.style.display = "flex";
