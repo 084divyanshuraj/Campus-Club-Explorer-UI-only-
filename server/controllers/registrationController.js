@@ -9,6 +9,8 @@ exports.createRegistration = (req, res) => {
     const studentName = (req.body.studentName || req.body.student_name || '').trim();
     const studentEmail = (req.body.studentEmail || req.body.student_email || '').trim().toLowerCase();
     const regNumber = (req.body.regNumber || req.body.reg_number || '').trim().toUpperCase();
+    const department = (req.body.department || 'Computer Science & Engineering').trim();
+    const year = (req.body.year || '2nd Year').trim();
     const clubName = (req.body.clubName || req.body.club_name || '').trim();
 
     // Field validations
@@ -43,13 +45,13 @@ exports.createRegistration = (req, res) => {
       });
     }
 
-    // Insert new application
+    // Insert new application with department & year
     const insertStmt = db.prepare(`
-      INSERT INTO registrations (student_name, student_email, reg_number, club_name, status)
-      VALUES (?, ?, ?, ?, 'Pending')
+      INSERT INTO registrations (student_name, student_email, reg_number, department, year, club_name, status)
+      VALUES (?, ?, ?, ?, ?, ?, 'Pending')
     `);
 
-    const result = insertStmt.run(studentName, studentEmail, regNumber, clubName);
+    const result = insertStmt.run(studentName, studentEmail, regNumber, department, year, clubName);
     const newReg = db.prepare('SELECT * FROM registrations WHERE id = ?').get(result.lastInsertRowid);
 
     res.status(201).json({

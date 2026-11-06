@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=2.5">
+  <link rel="stylesheet" href="style.css?v=2.6">
 </head>
 <body>
 
@@ -572,6 +572,38 @@
             >
           </div>
 
+          <!-- Department & Year Row -->
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label for="studentDepartment" class="form-label">
+                Department / Branch <span class="required-star">*</span>
+              </label>
+              <select id="studentDepartment" class="form-select">
+                <option value="Computer Science & Engineering">Computer Science & Engineering (CSE)</option>
+                <option value="Electronics & Communication">Electronics & Communication (ECE)</option>
+                <option value="Information Technology">Information Technology (IT)</option>
+                <option value="Mechanical Engineering">Mechanical Engineering (ME)</option>
+                <option value="Civil Engineering">Civil Engineering (CE)</option>
+                <option value="Electrical Engineering">Electrical Engineering (EE)</option>
+                <option value="Business Administration">Business Administration (BBA/MBA)</option>
+                <option value="Design & Media">Design & Media</option>
+                <option value="Biotechnology">Biotechnology</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="studentYear" class="form-label">
+                Year of Study <span class="required-star">*</span>
+              </label>
+              <select id="studentYear" class="form-select">
+                <option value="1st Year (Freshman)">1st Year (Freshman)</option>
+                <option value="2nd Year (Sophomore)" selected>2nd Year (Sophomore)</option>
+                <option value="3rd Year (Junior)">3rd Year (Junior)</option>
+                <option value="4th Year (Senior)">4th Year (Senior)</option>
+              </select>
+            </div>
+          </div>
+
           <!-- Club Selection Dropdown -->
           <div class="form-group">
             <label for="clubSelect" class="form-label">
@@ -688,6 +720,7 @@
               <tr>
                 <th>Applicant</th>
                 <th>Roll / Reg No</th>
+                <th>Dept & Year</th>
                 <th>Club</th>
                 <th>Date</th>
                 <th>Status</th>
@@ -768,6 +801,66 @@
         <!-- Login Form -->
         <form id="loginForm" onsubmit="handleLoginSubmit(event)" novalidate>
           
+          <!-- Student Extra Details (Name, Reg No, Dept, Year) -->
+          <div id="studentAuthFields">
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label for="loginStudentName" class="form-label">
+                  Student Full Name <span class="required-star">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="loginStudentName" 
+                  class="form-input" 
+                  placeholder="e.g. Aarav Sharma" 
+                  value="Aarav Sharma"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="loginRegNumber" class="form-label">
+                  Registration / Roll No <span class="required-star">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="loginRegNumber" 
+                  class="form-input" 
+                  placeholder="e.g. 2024CS1042" 
+                  value="2024CS1042"
+                >
+              </div>
+            </div>
+
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label for="loginDepartment" class="form-label">
+                  Department / Branch <span class="required-star">*</span>
+                </label>
+                <select id="loginDepartment" class="form-select">
+                  <option value="Computer Science & Engineering" selected>Computer Science & Engineering (CSE)</option>
+                  <option value="Electronics & Communication">Electronics & Communication (ECE)</option>
+                  <option value="Information Technology">Information Technology (IT)</option>
+                  <option value="Mechanical Engineering">Mechanical Engineering (ME)</option>
+                  <option value="Civil Engineering">Civil Engineering (CE)</option>
+                  <option value="Electrical Engineering">Electrical Engineering (EE)</option>
+                  <option value="Business Administration">Business Administration (BBA/MBA)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="loginYear" class="form-label">
+                  Year of Study <span class="required-star">*</span>
+                </label>
+                <select id="loginYear" class="form-select">
+                  <option value="1st Year (Freshman)">1st Year (Freshman)</option>
+                  <option value="2nd Year (Sophomore)" selected>2nd Year (Sophomore)</option>
+                  <option value="3rd Year (Junior)">3rd Year (Junior)</option>
+                  <option value="4th Year (Senior)">4th Year (Senior)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <!-- Email / Username -->
           <div class="form-group">
             <label for="loginEmail" class="form-label" id="loginEmailLabel">
@@ -778,6 +871,7 @@
               id="loginEmail" 
               class="form-input" 
               placeholder="e.g. aarav.sharma@campus.edu" 
+              value="aarav.sharma@campus.edu"
               autocomplete="email"
               required
             >
@@ -798,6 +892,7 @@
               id="loginPassword" 
               class="form-input" 
               placeholder="Enter password" 
+              value="student123"
               autocomplete="current-password"
               required
             >
@@ -806,12 +901,15 @@
           <!-- Quick Test Demo Credentials Notice -->
           <div class="demo-login-box">
             <span class="demo-title">⚡ Quick 1-Click Demo Login:</span>
-            <div class="demo-btn-group">
+            <div class="demo-btn-group" style="grid-template-columns: 1fr 1fr 1fr;">
               <button type="button" class="btn-demo-fill" onclick="useDemoLogin('student')">
-                🎓 Aarav Sharma (Student)
+                🎓 Aarav (CSE • 2nd Yr)
+              </button>
+              <button type="button" class="btn-demo-fill" onclick="useDemoLogin('student2')">
+                🎓 Priya (ECE • 1st Yr)
               </button>
               <button type="button" class="btn-demo-fill" onclick="useDemoLogin('admin')">
-                🛡️ Campus Admin (Lead)
+                🛡️ Admin (Lead)
               </button>
             </div>
           </div>
@@ -897,6 +995,6 @@
   </div>
 
   <!-- JavaScript File -->
-  <script src="script.js?v=2.5"></script>
+  <script src="script.js?v=2.6"></script>
 </body>
 </html>

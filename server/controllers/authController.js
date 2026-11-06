@@ -16,6 +16,18 @@ const DEMO_USERS = {
     name: 'Aarav Sharma',
     email: 'aarav.sharma@campus.edu',
     regNumber: '2024CS1042',
+    department: 'Computer Science & Engineering',
+    year: '2nd Year',
+    role: 'student',
+    password: 'student123'
+  },
+  student2: {
+    id: 'student_2',
+    name: 'Priya Nair',
+    email: 'priya.nair@campus.edu',
+    regNumber: '2024EC2105',
+    department: 'Electronics & Communication',
+    year: '1st Year',
     role: 'student',
     password: 'student123'
   }
@@ -71,6 +83,25 @@ exports.login = (req, res) => {
             name: DEMO_USERS.student.name,
             email: DEMO_USERS.student.email,
             regNumber: DEMO_USERS.student.regNumber,
+            department: DEMO_USERS.student.department,
+            year: DEMO_USERS.student.year,
+            role: 'student'
+          }
+        });
+      }
+
+      // Demo student 2 match (Priya Nair)
+      if (trimmedEmail === DEMO_USERS.student2.email && password === DEMO_USERS.student2.password) {
+        return res.json({
+          success: true,
+          message: `Welcome back, ${DEMO_USERS.student2.name}!`,
+          user: {
+            id: DEMO_USERS.student2.id,
+            name: DEMO_USERS.student2.name,
+            email: DEMO_USERS.student2.email,
+            regNumber: DEMO_USERS.student2.regNumber,
+            department: DEMO_USERS.student2.department,
+            year: DEMO_USERS.student2.year,
             role: 'student'
           }
         });
@@ -78,15 +109,21 @@ exports.login = (req, res) => {
 
       // Allow any valid college email format for student exploration
       if (trimmedEmail.includes('@') && password.length >= 4) {
-        const generatedName = trimmedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const studentName = (req.body.name || trimmedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())).trim();
+        const regNumber = (req.body.regNumber || '2024CAMPUS' + Math.floor(1000 + Math.random() * 9000)).trim().toUpperCase();
+        const department = (req.body.department || 'Computer Science & Engineering').trim();
+        const year = (req.body.year || '2nd Year').trim();
+
         return res.json({
           success: true,
-          message: `Welcome, ${generatedName}!`,
+          message: `Welcome, ${studentName}!`,
           user: {
             id: 'student_' + Date.now(),
-            name: generatedName,
+            name: studentName,
             email: trimmedEmail,
-            regNumber: '2024CAMPUS' + Math.floor(1000 + Math.random() * 9000),
+            regNumber,
+            department,
+            year,
             role: 'student'
           }
         });

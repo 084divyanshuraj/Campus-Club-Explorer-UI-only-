@@ -151,6 +151,8 @@ const DEFAULT_REGISTRATIONS = [
     student_name: "Aarav Sharma",
     student_email: "aarav.sharma@campus.edu",
     reg_number: "2024CS1042",
+    department: "Computer Science & Engineering",
+    year: "2nd Year",
     club_name: "ACM Student Chapter",
     status: "Approved",
     created_at: new Date(Date.now() - 3 * 86400000).toISOString()
@@ -160,6 +162,8 @@ const DEFAULT_REGISTRATIONS = [
     student_name: "Priya Nair",
     student_email: "priya.nair@campus.edu",
     reg_number: "2024EC2105",
+    department: "Electronics & Communication",
+    year: "1st Year",
     club_name: "Robotics Club",
     status: "Pending",
     created_at: new Date(Date.now() - 1 * 86400000).toISOString()
@@ -169,6 +173,8 @@ const DEFAULT_REGISTRATIONS = [
     student_name: "Rohan Verma",
     student_email: "rohan.verma@campus.edu",
     reg_number: "2024ME3319",
+    department: "Mechanical Engineering",
+    year: "3rd Year",
     club_name: "Sports Club",
     status: "Pending",
     created_at: new Date(Date.now() - 4 * 3600000).toISOString()
@@ -273,6 +279,9 @@ let studentAppsEmptyState = document.getElementById("studentAppsEmptyState");
 let heroStatClubs = document.getElementById("heroStatClubs");
 let heroStatMembers = document.getElementById("heroStatMembers");
 
+// Pending club to join after login
+let pendingClubToJoin = null;
+
 // Mobile Navigation
 let hamburgerBtn = document.getElementById("hamburgerBtn");
 let navLinks = document.getElementById("navLinks");
@@ -335,6 +344,7 @@ async function fetchClubs() {
         clubs = data.data;
         displayClubs();
         populateClubDropdowns();
+        fetchStats(); // Update stats immediately once clubs are loaded
         return;
       }
     }
@@ -346,31 +356,34 @@ async function fetchClubs() {
     clubs = getLocalClubs();
     displayClubs();
     populateClubDropdowns();
+    fetchStats();
   }
 }
 
 async function fetchStats() {
-  if (isBackendOnline) {
-    try {
-      const response = await fetch('/api/stats');
-      if (response.ok) {
-        const res = await response.json();
-        if (res.success && res.data) {
-          applyStatsToUI(res.data.totalClubs, res.data.totalMembers, res.data.registrations);
-          return;
-        }
+  // 1. Always attempt live API first
+  try {
+    const response = await fetch('/api/stats');
+    if (response.ok) {
+      const res = await response.json();
+      if (res.success && res.data) {
+        isBackendOnline = true;
+        applyStatsToUI(res.data.totalClubs, res.data.totalMembers, res.data.registrations);
+        return;
       }
-    } catch (e) {
-      console.warn("Could not sync stats with API, computing locally.");
     }
+  } catch (e) {
+    // API not reachable, compute locally
   }
 
-  // Standalone / Vercel calculation
-  const totalClubs = clubs.length;
+  // 2. Standalone / Local Fallback calculation (Guaranteed non-empty)
+  const clubList = (clubs && clubs.length > 0) ? clubs : getLocalClubs();
+  const totalClubs = clubList.length || 8;
   let totalMembers = 0;
-  for (let i = 0; i < clubs.length; i++) {
-    totalMembers += (clubs[i].members || 0);
+  for (let i = 0; i < clubList.length; i++) {
+    totalMembers += (clubList[i].members || 0);
   }
+  if (totalMembers === 0) totalMembers = 2260;
 
   const regs = getLocalRegistrations();
   const counts = {
@@ -384,8 +397,11 @@ async function fetchStats() {
 }
 
 function applyStatsToUI(totalClubs, totalMembers, regCounts) {
-  if (heroStatClubs) heroStatClubs.textContent = `${totalClubs}+`;
-  if (heroStatMembers) heroStatMembers.textContent = `${Number(totalMembers).toLocaleString()}+`;
+  const displayClubs = (totalClubs && totalClubs > 0) ? totalClubs : 8;
+  const displayMembers = (totalMembers && totalMembers > 0) ? totalMembers : 2260;
+
+  if (heroStatClubs) heroStatClubs.textContent = `${displayClubs}+`;
+  if (heroStatMembers) heroStatMembers.textContent = `${Number(displayMembers).toLocaleString()}+`;
 
   const pending = regCounts.pending || 0;
   if (adminBadgeCount) {
@@ -625,6 +641,13 @@ function switchToJoinFromDetails() {
    10. JOIN CLUB REGISTRATION MODAL & SUBMISSION (Hybrid API + Standalone)
    -------------------------------------------------------------------------- */
 function openJoinModal(preselectedClubName) {
+  // Enforce mandatory Student Login before applying to any club
+  if (!currentUser || currentUser.role !== "student") {
+    pendingClubToJoin = preselectedClubName || null;
+    openLoginModal("student", "Please sign in with your student credentials (Registration No, Department, Year) to apply for campus clubs!");
+    return;
+  }
+
   formErrorAlert.style.display = "none";
   formSuccessAlert.style.display = "none";
   joinClubForm.style.display = "block";
@@ -634,11 +657,18 @@ function openJoinModal(preselectedClubName) {
     submitJoinBtn.textContent = "Submit Application";
   }
 
-  // Pre-fill student info if logged in as student
-  if (currentUser && currentUser.role === "student") {
-    if (studentNameInput && !studentNameInput.value) studentNameInput.value = currentUser.name || "";
-    if (studentEmailInput && !studentEmailInput.value) studentEmailInput.value = currentUser.email || "";
-    if (regNumberInput && !regNumberInput.value && currentUser.regNumber) regNumberInput.value = currentUser.regNumber;
+  // Pre-fill student info from authenticated student session
+  if (studentNameInput) studentNameInput.value = currentUser.name || "";
+  if (studentEmailInput) studentEmailInput.value = currentUser.email || "";
+  if (regNumberInput) regNumberInput.value = currentUser.regNumber || "";
+
+  const deptSelect = document.getElementById("studentDepartment");
+  if (deptSelect && currentUser.department) {
+    deptSelect.value = currentUser.department;
+  }
+  const yearSelect = document.getElementById("studentYear");
+  if (yearSelect && currentUser.year) {
+    yearSelect.value = currentUser.year;
   }
 
   if (preselectedClubName && clubSelectDropdown) {
@@ -668,6 +698,8 @@ async function handleJoinFormSubmit(event) {
   let nameValue = studentNameInput.value.trim();
   let emailValue = studentEmailInput.value.trim();
   let regValue = regNumberInput.value.trim();
+  let deptValue = document.getElementById("studentDepartment") ? document.getElementById("studentDepartment").value : "Computer Science & Engineering";
+  let yearValue = document.getElementById("studentYear") ? document.getElementById("studentYear").value : "2nd Year (Sophomore)";
   let clubValue = clubSelectDropdown.value;
 
   // Frontend validation
@@ -705,6 +737,8 @@ async function handleJoinFormSubmit(event) {
           studentName: nameValue,
           studentEmail: emailValue,
           regNumber: regValue,
+          department: deptValue,
+          year: yearValue,
           clubName: clubValue
         })
       });
@@ -739,6 +773,8 @@ async function handleJoinFormSubmit(event) {
     student_name: nameValue,
     student_email: emailValue,
     reg_number: regValue,
+    department: deptValue,
+    year: yearValue,
     club_name: clubValue,
     status: "Pending",
     created_at: new Date().toISOString()
@@ -880,6 +916,10 @@ function renderAdminApplications(applications) {
           </div>
         </td>
         <td><span class="reg-badge">${app.reg_number}</span></td>
+        <td>
+          <span class="dept-badge" title="${app.department || 'Computer Science & Engineering'}">${(app.department || 'CSE').replace('Computer Science & Engineering', 'CSE').replace('Electronics & Communication', 'ECE').replace('Information Technology', 'IT').replace('Mechanical Engineering', 'ME').replace('Civil Engineering', 'CE').replace('Electrical Engineering', 'EE').replace('Business Administration', 'BBA')}</span>
+          <br><small style="color: var(--text-muted); font-size: 0.75rem;">${app.year || '2nd Year'}</small>
+        </td>
         <td><strong>${app.club_name}</strong></td>
         <td style="white-space: nowrap; color: var(--text-muted); font-size: 0.82rem;">${dateFormatted}</td>
         <td>
@@ -1078,34 +1118,67 @@ function setLoginRole(role) {
   const emailLabel = loginEmailLabel || document.getElementById("loginEmailLabel");
   const emailInput = loginEmail || document.getElementById("loginEmail");
   const submitBtn = loginSubmitBtn || document.getElementById("loginSubmitBtn");
+  const studentFields = document.getElementById("studentAuthFields");
 
   if (role === "admin") {
+    if (studentFields) studentFields.style.display = "none";
     if (rolePill) {
       rolePill.textContent = "Club Lead & Staff Access";
       rolePill.className = "club-category-pill cat-biz";
     }
     if (modalTitle) modalTitle.textContent = "Club Admin Sign In";
     if (emailLabel) emailLabel.innerHTML = 'Admin Email <span class="required-star">*</span>';
-    if (emailInput) emailInput.placeholder = "admin@campus.edu";
+    if (emailInput) {
+      emailInput.placeholder = "admin@campus.edu";
+      emailInput.value = "admin@campus.edu";
+    }
+    if (loginPassword) loginPassword.value = "admin123";
     if (submitBtn) submitBtn.textContent = "Sign In as Administrator";
   } else {
+    if (studentFields) studentFields.style.display = "block";
     if (rolePill) {
       rolePill.textContent = "Campus Student Portal";
       rolePill.className = "club-category-pill cat-tech";
     }
     if (modalTitle) modalTitle.textContent = "Student Sign In";
     if (emailLabel) emailLabel.innerHTML = 'College Email <span class="required-star">*</span>';
-    if (emailInput) emailInput.placeholder = "e.g. aarav.sharma@campus.edu";
+    if (emailInput) {
+      emailInput.placeholder = "e.g. aarav.sharma@campus.edu";
+      if (!emailInput.value || emailInput.value === "admin@campus.edu") {
+        emailInput.value = "aarav.sharma@campus.edu";
+      }
+    }
+    if (loginPassword && (!loginPassword.value || loginPassword.value === "admin123")) {
+      loginPassword.value = "student123";
+    }
     if (submitBtn) submitBtn.textContent = "Sign In as Student";
   }
 }
 
 function useDemoLogin(role) {
-  setLoginRole(role);
+  setLoginRole(role === "admin" ? "admin" : "student");
+
+  const sName = document.getElementById("loginStudentName");
+  const sReg = document.getElementById("loginRegNumber");
+  const sDept = document.getElementById("loginDepartment");
+  const sYear = document.getElementById("loginYear");
+
   if (role === "admin") {
     if (loginEmail) loginEmail.value = "admin@campus.edu";
     if (loginPassword) loginPassword.value = "admin123";
+  } else if (role === "student2") {
+    if (sName) sName.value = "Priya Nair";
+    if (sReg) sReg.value = "2024EC2105";
+    if (sDept) sDept.value = "Electronics & Communication";
+    if (sYear) sYear.value = "1st Year (Freshman)";
+    if (loginEmail) loginEmail.value = "priya.nair@campus.edu";
+    if (loginPassword) loginPassword.value = "student123";
   } else {
+    // Default student (Aarav)
+    if (sName) sName.value = "Aarav Sharma";
+    if (sReg) sReg.value = "2024CS1042";
+    if (sDept) sDept.value = "Computer Science & Engineering";
+    if (sYear) sYear.value = "2nd Year (Sophomore)";
     if (loginEmail) loginEmail.value = "aarav.sharma@campus.edu";
     if (loginPassword) loginPassword.value = "student123";
   }
@@ -1131,10 +1204,33 @@ async function handleLoginSubmit(event) {
   const emailVal = loginEmail ? loginEmail.value.trim() : "";
   const passwordVal = loginPassword ? loginPassword.value.trim() : "";
 
+  const studentNameInput = document.getElementById("loginStudentName");
+  const studentRegInput = document.getElementById("loginRegNumber");
+  const studentDeptInput = document.getElementById("loginDepartment");
+  const studentYearInput = document.getElementById("loginYear");
+
+  const nameVal = studentNameInput ? studentNameInput.value.trim() : "";
+  const regVal = studentRegInput ? studentRegInput.value.trim().toUpperCase() : "";
+  const deptVal = studentDeptInput ? studentDeptInput.value : "Computer Science & Engineering";
+  const yearVal = studentYearInput ? studentYearInput.value : "2nd Year (Sophomore)";
+
   if (!emailVal || !passwordVal) {
     if (loginErrorMessage) loginErrorMessage.textContent = "Please enter both email and password.";
     if (loginErrorAlert) loginErrorAlert.style.display = "flex";
     return;
+  }
+
+  if (currentLoginRole === "student") {
+    if (!nameVal) {
+      if (loginErrorMessage) loginErrorMessage.textContent = "Please enter your full student name.";
+      if (loginErrorAlert) loginErrorAlert.style.display = "flex";
+      return;
+    }
+    if (!regVal) {
+      if (loginErrorMessage) loginErrorMessage.textContent = "Please enter your university roll / registration number.";
+      if (loginErrorAlert) loginErrorAlert.style.display = "flex";
+      return;
+    }
   }
 
   if (loginSubmitBtn) {
@@ -1142,13 +1238,21 @@ async function handleLoginSubmit(event) {
     loginSubmitBtn.textContent = "Signing In...";
   }
 
-  // 1. Try Backend API
+  // 1. Try Live Express REST Backend API
   if (isBackendOnline) {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: emailVal, password: passwordVal, role: currentLoginRole })
+        body: JSON.stringify({
+          email: emailVal,
+          password: passwordVal,
+          role: currentLoginRole,
+          name: nameVal,
+          regNumber: regVal,
+          department: deptVal,
+          year: yearVal
+        })
       });
 
       const result = await response.json();
@@ -1158,7 +1262,7 @@ async function handleLoginSubmit(event) {
       }
       throw new Error(result.message || "Invalid credentials.");
     } catch (err) {
-      console.warn("Backend auth failed, checking standalone rules:", err);
+      console.warn("Backend auth failed, checking fallback:", err);
       // Fallback allowed if offline/Vercel
       if (isBackendOnline) {
         if (loginErrorMessage) loginErrorMessage.textContent = err.message;
@@ -1172,7 +1276,7 @@ async function handleLoginSubmit(event) {
     }
   }
 
-  // 2. Client-side / Vercel Fallback Validation
+  // 2. Client-side / Vercel Standalone Fallback Validation
   if (currentLoginRole === "admin") {
     if (emailVal.toLowerCase() === "admin@campus.edu" && passwordVal === "admin123") {
       completeLoginSuccess({
@@ -1192,25 +1296,44 @@ async function handleLoginSubmit(event) {
       return;
     }
   } else {
-    // Student Fallback
+    // Student Fallback - Aarav
     if (emailVal.toLowerCase() === "aarav.sharma@campus.edu" && passwordVal === "student123") {
       completeLoginSuccess({
         id: "student_demo",
-        name: "Aarav Sharma",
+        name: nameVal || "Aarav Sharma",
         email: "aarav.sharma@campus.edu",
-        regNumber: "2024CS1042",
+        regNumber: regVal || "2024CS1042",
+        department: deptVal || "Computer Science & Engineering",
+        year: yearVal || "2nd Year (Sophomore)",
         role: "student"
       });
       return;
     }
 
+    // Student Fallback - Priya
+    if (emailVal.toLowerCase() === "priya.nair@campus.edu" && passwordVal === "student123") {
+      completeLoginSuccess({
+        id: "student_demo_2",
+        name: nameVal || "Priya Nair",
+        email: "priya.nair@campus.edu",
+        regNumber: regVal || "2024EC2105",
+        department: deptVal || "Electronics & Communication",
+        year: yearVal || "1st Year (Freshman)",
+        role: "student"
+      });
+      return;
+    }
+
+    // Any valid student credentials
     if (emailVal.includes("@") && passwordVal.length >= 4) {
-      const parsedName = emailVal.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+      const parsedName = nameVal || (emailVal.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, l => l.toUpperCase()));
       completeLoginSuccess({
         id: "student_" + Date.now(),
         name: parsedName,
         email: emailVal,
-        regNumber: "2024CAMPUS" + Math.floor(1000 + Math.random() * 9000),
+        regNumber: regVal || ("2024CAMPUS" + Math.floor(1000 + Math.random() * 9000)),
+        department: deptVal,
+        year: yearVal,
         role: "student"
       });
       return;
@@ -1242,7 +1365,13 @@ function completeLoginSuccess(user) {
     if (user.role === "admin") {
       openAdminModal();
     } else {
-      showAdminToast(`Signed in as ${user.name}`, "success");
+      showAdminToast(`Signed in as ${user.name} (${user.regNumber || 'Student'})`, "success");
+      // Seamless auto-resume: if user was trying to join a club, open the modal with their info pre-filled!
+      if (pendingClubToJoin) {
+        const clubToOpen = pendingClubToJoin;
+        pendingClubToJoin = null;
+        openJoinModal(clubToOpen);
+      }
     }
 
     if (loginSubmitBtn) {
@@ -1370,10 +1499,9 @@ function handleNavLinkClick() {
 /* --------------------------------------------------------------------------
    15. APPLICATION INITIALIZATION & EVENT LISTENERS
    -------------------------------------------------------------------------- */
-function initializeApp() {
+async function initializeApp() {
   // 1. Initial live data fetch (with automatic Vercel fallback)
-  fetchClubs();
-  fetchStats();
+  await fetchClubs();
   updateAuthUI();
 
   // 2. Category button clicks

@@ -44,12 +44,18 @@ function initDatabase() {
       student_name TEXT NOT NULL,
       student_email TEXT NOT NULL,
       reg_number TEXT NOT NULL,
+      department TEXT DEFAULT 'Computer Science & Engineering',
+      year TEXT DEFAULT '2nd Year',
       club_name TEXT NOT NULL,
       status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  // Safe migration for existing DB
+  try { db.exec("ALTER TABLE registrations ADD COLUMN department TEXT DEFAULT 'Computer Science & Engineering';"); } catch(e){}
+  try { db.exec("ALTER TABLE registrations ADD COLUMN year TEXT DEFAULT '2nd Year';"); } catch(e){}
 
   // Check if clubs need seeding
   const clubCountRow = db.prepare('SELECT COUNT(*) as count FROM clubs').get();
@@ -91,8 +97,8 @@ function seedClubs() {
 
 function seedRegistrations() {
   const insertStmt = db.prepare(`
-    INSERT INTO registrations (student_name, student_email, reg_number, club_name, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO registrations (student_name, student_email, reg_number, department, year, club_name, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   for (const reg of sampleRegistrations) {
@@ -100,6 +106,8 @@ function seedRegistrations() {
       reg.student_name,
       reg.student_email,
       reg.reg_number,
+      reg.department || 'Computer Science & Engineering',
+      reg.year || '2nd Year',
       reg.club_name,
       reg.status,
       reg.created_at

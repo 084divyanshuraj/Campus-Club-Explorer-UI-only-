@@ -146,6 +146,8 @@ const sampleRegistrations = [
     student_name: "Aarav Sharma",
     student_email: "aarav.sharma@campus.edu",
     reg_number: "2024CS1042",
+    department: "Computer Science & Engineering",
+    year: "2nd Year",
     club_name: "ACM Student Chapter",
     status: "Approved",
     created_at: new Date(Date.now() - 3 * 86400000).toISOString()
@@ -154,6 +156,8 @@ const sampleRegistrations = [
     student_name: "Priya Nair",
     student_email: "priya.nair@campus.edu",
     reg_number: "2024EC2105",
+    department: "Electronics & Communication",
+    year: "1st Year",
     club_name: "Robotics Club",
     status: "Pending",
     created_at: new Date(Date.now() - 1 * 86400000).toISOString()
@@ -162,6 +166,8 @@ const sampleRegistrations = [
     student_name: "Rohan Verma",
     student_email: "rohan.verma@campus.edu",
     reg_number: "2024ME3319",
+    department: "Mechanical Engineering",
+    year: "3rd Year",
     club_name: "Sports Club",
     status: "Pending",
     created_at: new Date(Date.now() - 4 * 3600000).toISOString()
