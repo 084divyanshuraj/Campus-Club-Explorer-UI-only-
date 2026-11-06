@@ -41,12 +41,30 @@
         <a href="#home" class="nav-link active" id="navLinkHome">Home</a>
         <a href="#clubsSection" class="nav-link" id="navLinkClubs">Explore Clubs</a>
         <a href="#aboutSection" class="nav-link" id="navLinkAbout">About</a>
-        <button type="button" class="btn btn-secondary nav-admin-btn" id="navAdminBtn" onclick="openAdminModal()">
-          <span>📋</span> Applications <span class="admin-badge" id="adminBadgeCount">0</span>
+        <button type="button" class="btn btn-secondary nav-admin-btn" id="navAdminBtn" onclick="handleAdminNavClick()">
+          <span>📊</span> Applications <span class="admin-badge" id="adminBadgeCount">0</span>
+        </button>
+        <button type="button" class="btn btn-secondary nav-student-apps-btn" id="navStudentAppsBtn" style="display: none;" onclick="openStudentAppsModal()">
+          <span>📋</span> My Applications
         </button>
         <button type="button" class="btn btn-primary nav-cta-btn" id="navJoinBtn" onclick="openJoinModal()">
           Join a Club
         </button>
+        <div class="nav-auth-container" id="navAuthContainer">
+          <button type="button" class="btn btn-secondary nav-signin-btn" id="navSignInBtn" onclick="openLoginModal()">
+            <span>🔐</span> Sign In
+          </button>
+          <div class="nav-user-pill" id="navUserPill" style="display: none;">
+            <div class="user-avatar" id="navUserAvatar">👤</div>
+            <div class="user-info">
+              <span class="user-name" id="navUserName">User</span>
+              <span class="user-role-badge" id="navUserRole">Student</span>
+            </div>
+            <button type="button" class="btn-logout" id="navLogoutBtn" onclick="handleLogout()" title="Sign Out">
+              ✕
+            </button>
+          </div>
+        </div>
       </nav>
 
       <!-- Hamburger Menu Button for Mobile -->
@@ -695,6 +713,184 @@
       <div class="modal-footer admin-modal-footer">
         <span class="admin-footer-note">⚡ Real-time SQLite Database Sync</span>
         <button type="button" class="btn btn-secondary" onclick="closeAdminModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       9. POPUP AUTHENTICATION / LOGIN MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="loginModal" aria-hidden="true">
+    <div class="modal-card modal-login-card" role="dialog" aria-labelledby="loginModalTitle">
+      
+      <!-- Close Button -->
+      <button type="button" class="modal-close-btn" id="closeLoginModalBtn" onclick="closeLoginModal()" aria-label="Close modal">
+        &times;
+      </button>
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="detail-icon-box login-icon-box">
+          🔐
+        </div>
+        <div class="detail-header-text">
+          <span class="club-category-pill cat-tech" id="loginRolePill">Campus Portal Access</span>
+          <h3 class="detail-title" id="loginModalTitle">Sign In to CampusConnect</h3>
+        </div>
+      </div>
+
+      <!-- Role Selector Tabs -->
+      <div class="login-role-tabs" id="loginRoleTabs">
+        <button type="button" class="role-tab active" data-role="student" onclick="setLoginRole('student')">
+          🎓 Student Login
+        </button>
+        <button type="button" class="role-tab" data-role="admin" onclick="setLoginRole('admin')">
+          🛡️ Club Admin Login
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        
+        <!-- Error Alert -->
+        <div class="form-alert alert-error" id="loginErrorAlert" style="display: none;">
+          <span class="alert-icon">⚠️</span>
+          <span id="loginErrorMessage">Invalid email or password.</span>
+        </div>
+
+        <!-- Success Alert -->
+        <div class="form-alert alert-success" id="loginSuccessAlert" style="display: none;">
+          <span class="alert-icon">🎉</span>
+          <span id="loginSuccessMessage">Login successful!</span>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)" novalidate>
+          
+          <!-- Email / Username -->
+          <div class="form-group">
+            <label for="loginEmail" class="form-label" id="loginEmailLabel">
+              College Email <span class="required-star">*</span>
+            </label>
+            <input 
+              type="email" 
+              id="loginEmail" 
+              class="form-input" 
+              placeholder="e.g. aarav.sharma@campus.edu" 
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <!-- Password Field -->
+          <div class="form-group">
+            <div class="label-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label for="loginPassword" class="form-label" style="margin-bottom: 0;">
+                Password <span class="required-star">*</span>
+              </label>
+              <button type="button" class="toggle-password-btn" id="togglePasswordBtn" onclick="togglePasswordVisibility('loginPassword', this)">
+                👁️ Show
+              </button>
+            </div>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              class="form-input" 
+              placeholder="Enter password" 
+              autocomplete="current-password"
+              required
+            >
+          </div>
+
+          <!-- Quick Test Demo Credentials Notice -->
+          <div class="demo-login-box">
+            <span class="demo-title">⚡ Quick 1-Click Demo Login:</span>
+            <div class="demo-btn-group">
+              <button type="button" class="btn-demo-fill" onclick="useDemoLogin('student')">
+                🎓 Aarav Sharma (Student)
+              </button>
+              <button type="button" class="btn-demo-fill" onclick="useDemoLogin('admin')">
+                🛡️ Campus Admin (Lead)
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-actions" style="margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeLoginModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="loginSubmitBtn">
+              Sign In as Student
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       10. STUDENT MY APPLICATIONS MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="studentAppsModal" aria-hidden="true">
+    <div class="modal-card modal-admin-card" role="dialog" aria-labelledby="studentAppsTitle">
+      <!-- Close Button -->
+      <button type="button" class="modal-close-btn" onclick="closeStudentAppsModal()" aria-label="Close modal">
+        &times;
+      </button>
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="detail-icon-box join-icon-box">
+          📋
+        </div>
+        <div class="detail-header-text">
+          <span class="club-category-pill cat-general">Student Dashboard</span>
+          <h3 class="detail-title" id="studentAppsTitle">My Club Applications</h3>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body admin-modal-body">
+        <p style="margin-bottom: 1.25rem; font-size: 0.92rem; color: var(--text-muted);">
+          Track the live review status of all your campus society and club registrations.
+        </p>
+
+        <div class="admin-table-container">
+          <table class="admin-table" id="studentAppsTable">
+            <thead>
+              <tr>
+                <th>Club Name</th>
+                <th>Applied Date</th>
+                <th>Roll / Reg No</th>
+                <th>Review Status</th>
+              </tr>
+            </thead>
+            <tbody id="studentAppsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+
+          <div class="admin-empty-state" id="studentAppsEmptyState" style="display: none;">
+            <span class="admin-empty-icon">📂</span>
+            <h4>No applications yet!</h4>
+            <p>You haven't applied to any clubs yet. Explore clubs and click "Join Club" to get started.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeStudentAppsModal(); scrollToClubs();">
+          Explore More Clubs
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="closeStudentAppsModal()">
+          Close
+        </button>
       </div>
 
     </div>

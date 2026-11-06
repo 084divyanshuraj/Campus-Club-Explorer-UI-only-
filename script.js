@@ -184,6 +184,10 @@ let currentCategory = "All Clubs";
 let currentSearchTerm = "";
 let currentDetailClub = null;
 
+// Auth State (Persists in localStorage)
+let currentUser = JSON.parse(localStorage.getItem("campus_auth_user")) || null;
+let currentLoginRole = "student";
+
 // Admin Portal State
 let adminStatusFilter = "All";
 let adminClubFilterValue = "All";
@@ -199,6 +203,15 @@ let clubSearchInput = document.getElementById("clubSearchInput");
 let heroSearchInput = document.getElementById("heroSearchInput");
 let clearSearchBtn = document.getElementById("clearSearchBtn");
 let categoryContainer = document.getElementById("categoryContainer");
+
+// Auth & Navigation Elements
+let navSignInBtn = document.getElementById("navSignInBtn");
+let navUserPill = document.getElementById("navUserPill");
+let navUserAvatar = document.getElementById("navUserAvatar");
+let navUserName = document.getElementById("navUserName");
+let navUserRole = document.getElementById("navUserRole");
+let navStudentAppsBtn = document.getElementById("navStudentAppsBtn");
+let navAdminBtn = document.getElementById("navAdminBtn");
 
 // Details Modal Elements
 let clubDetailsModal = document.getElementById("clubDetailsModal");
@@ -236,6 +249,25 @@ let adminStatusTabs = document.getElementById("adminStatusTabs");
 let adminTableBody = document.getElementById("adminTableBody");
 let adminEmptyState = document.getElementById("adminEmptyState");
 let adminToast = document.getElementById("adminToast");
+
+// Login Modal Elements
+let loginModal = document.getElementById("loginModal");
+let loginRoleTabs = document.getElementById("loginRoleTabs");
+let loginRolePill = document.getElementById("loginRolePill");
+let loginModalTitle = document.getElementById("loginModalTitle");
+let loginEmail = document.getElementById("loginEmail");
+let loginEmailLabel = document.getElementById("loginEmailLabel");
+let loginPassword = document.getElementById("loginPassword");
+let loginSubmitBtn = document.getElementById("loginSubmitBtn");
+let loginErrorAlert = document.getElementById("loginErrorAlert");
+let loginErrorMessage = document.getElementById("loginErrorMessage");
+let loginSuccessAlert = document.getElementById("loginSuccessAlert");
+let loginSuccessMessage = document.getElementById("loginSuccessMessage");
+
+// Student Apps Modal Elements
+let studentAppsModal = document.getElementById("studentAppsModal");
+let studentAppsTableBody = document.getElementById("studentAppsTableBody");
+let studentAppsEmptyState = document.getElementById("studentAppsEmptyState");
 
 // Hero Stats Elements
 let heroStatClubs = document.getElementById("heroStatClubs");
@@ -594,6 +626,13 @@ function openJoinModal(preselectedClubName) {
     submitJoinBtn.textContent = "Submit Application";
   }
 
+  // Pre-fill student info if logged in as student
+  if (currentUser && currentUser.role === "student") {
+    if (studentNameInput && !studentNameInput.value) studentNameInput.value = currentUser.name || "";
+    if (studentEmailInput && !studentEmailInput.value) studentEmailInput.value = currentUser.email || "";
+    if (regNumberInput && !regNumberInput.value && currentUser.regNumber) regNumberInput.value = currentUser.regNumber;
+  }
+
   if (preselectedClubName && clubSelectDropdown) {
     clubSelectDropdown.value = preselectedClubName;
   }
@@ -925,7 +964,348 @@ async function deleteRegistration(id) {
 
 
 /* --------------------------------------------------------------------------
-   12. MOBILE NAVIGATION
+   12. AUTHENTICATION & ROLE MANAGEMENT (Student & Admin)
+   -------------------------------------------------------------------------- */
+function updateAuthUI() {
+  if (currentUser) {
+    if (navSignInBtn) navSignInBtn.style.display = "none";
+    if (navUserPill) navUserPill.style.display = "inline-flex";
+    if (navUserName) navUserName.textContent = currentUser.name || "User";
+    if (navUserRole) navUserRole.textContent = currentUser.role === "admin" ? "🛡️ Admin" : "🎓 Student";
+    if (navUserAvatar) navUserAvatar.textContent = currentUser.role === "admin" ? "🛡️" : "🎓";
+
+    if (currentUser.role === "admin") {
+      if (navAdminBtn) navAdminBtn.style.display = "inline-flex";
+      if (navStudentAppsBtn) navStudentAppsBtn.style.display = "none";
+    } else {
+      if (navAdminBtn) navAdminBtn.style.display = "none";
+      if (navStudentAppsBtn) navStudentAppsBtn.style.display = "inline-flex";
+    }
+  } else {
+    if (navSignInBtn) navSignInBtn.style.display = "inline-flex";
+    if (navUserPill) navUserPill.style.display = "none";
+    if (navStudentAppsBtn) navStudentAppsBtn.style.display = "none";
+    if (navAdminBtn) navAdminBtn.style.display = "inline-flex";
+  }
+}
+
+function handleAdminNavClick() {
+  if (currentUser && currentUser.role === "admin") {
+    openAdminModal();
+  } else {
+    openLoginModal("admin", "Admin access required to view and manage student registrations.");
+  }
+}
+
+function openLoginModal(role = "student", noticeMessage = "") {
+  if (!loginModal) return;
+
+  setLoginRole(role);
+
+  if (loginErrorAlert) {
+    if (noticeMessage) {
+      if (loginErrorMessage) loginErrorMessage.textContent = noticeMessage;
+      loginErrorAlert.style.display = "flex";
+    } else {
+      loginErrorAlert.style.display = "none";
+    }
+  }
+
+  if (loginSuccessAlert) loginSuccessAlert.style.display = "none";
+
+  loginModal.classList.add("active");
+  loginModal.setAttribute("aria-hidden", "false");
+}
+
+function closeLoginModal() {
+  if (loginModal) {
+    loginModal.classList.remove("active");
+    loginModal.setAttribute("aria-hidden", "true");
+  }
+}
+
+function setLoginRole(role) {
+  currentLoginRole = role;
+
+  if (loginRoleTabs) {
+    const tabs = loginRoleTabs.querySelectorAll(".role-tab");
+    tabs.forEach(tab => {
+      if (tab.getAttribute("data-role") === role) {
+        tab.classList.add("active");
+      } else {
+        tab.classList.remove("active");
+      }
+    });
+  }
+
+  if (role === "admin") {
+    if (loginRolePill) {
+      loginRolePill.textContent = "Club Lead & Staff Access";
+      loginRolePill.className = "club-category-pill cat-biz";
+    }
+    if (loginModalTitle) loginModalTitle.textContent = "Club Admin Sign In";
+    if (loginEmailLabel) loginEmailLabel.innerHTML = 'Admin Email <span class="required-star">*</span>';
+    if (loginEmail) loginEmail.placeholder = "admin@campus.edu";
+    if (loginSubmitBtn) loginSubmitBtn.textContent = "Sign In as Administrator";
+  } else {
+    if (loginRolePill) {
+      loginRolePill.textContent = "Campus Student Portal";
+      loginRolePill.className = "club-category-pill cat-tech";
+    }
+    if (loginModalTitle) loginModalTitle.textContent = "Student Sign In";
+    if (loginEmailLabel) loginEmailLabel.innerHTML = 'College Email <span class="required-star">*</span>';
+    if (loginEmail) loginEmail.placeholder = "e.g. aarav.sharma@campus.edu";
+    if (loginSubmitBtn) loginSubmitBtn.textContent = "Sign In as Student";
+  }
+}
+
+function useDemoLogin(role) {
+  setLoginRole(role);
+  if (role === "admin") {
+    if (loginEmail) loginEmail.value = "admin@campus.edu";
+    if (loginPassword) loginPassword.value = "admin123";
+  } else {
+    if (loginEmail) loginEmail.value = "aarav.sharma@campus.edu";
+    if (loginPassword) loginPassword.value = "student123";
+  }
+  handleLoginSubmit(new Event("submit"));
+}
+
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  if (input.type === "password") {
+    input.type = "text";
+    btn.textContent = "🙈 Hide";
+  } else {
+    input.type = "password";
+    btn.textContent = "👁️ Show";
+  }
+}
+
+async function handleLoginSubmit(event) {
+  if (event && event.preventDefault) event.preventDefault();
+
+  const emailVal = loginEmail ? loginEmail.value.trim() : "";
+  const passwordVal = loginPassword ? loginPassword.value.trim() : "";
+
+  if (!emailVal || !passwordVal) {
+    if (loginErrorMessage) loginErrorMessage.textContent = "Please enter both email and password.";
+    if (loginErrorAlert) loginErrorAlert.style.display = "flex";
+    return;
+  }
+
+  if (loginSubmitBtn) {
+    loginSubmitBtn.disabled = true;
+    loginSubmitBtn.textContent = "Signing In...";
+  }
+
+  // 1. Try Backend API
+  if (isBackendOnline) {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailVal, password: passwordVal, role: currentLoginRole })
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success && result.user) {
+        completeLoginSuccess(result.user);
+        return;
+      }
+      throw new Error(result.message || "Invalid credentials.");
+    } catch (err) {
+      console.warn("Backend auth failed, checking standalone rules:", err);
+      // Fallback allowed if offline/Vercel
+      if (isBackendOnline) {
+        if (loginErrorMessage) loginErrorMessage.textContent = err.message;
+        if (loginErrorAlert) loginErrorAlert.style.display = "flex";
+        if (loginSubmitBtn) {
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtn.textContent = currentLoginRole === "admin" ? "Sign In as Administrator" : "Sign In as Student";
+        }
+        return;
+      }
+    }
+  }
+
+  // 2. Client-side / Vercel Fallback Validation
+  if (currentLoginRole === "admin") {
+    if (emailVal.toLowerCase() === "admin@campus.edu" && passwordVal === "admin123") {
+      completeLoginSuccess({
+        id: "admin_demo",
+        name: "Campus Administrator",
+        email: "admin@campus.edu",
+        role: "admin"
+      });
+      return;
+    } else {
+      if (loginErrorMessage) loginErrorMessage.textContent = "Invalid Admin login. Use admin@campus.edu / admin123";
+      if (loginErrorAlert) loginErrorAlert.style.display = "flex";
+      if (loginSubmitBtn) {
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = "Sign In as Administrator";
+      }
+      return;
+    }
+  } else {
+    // Student Fallback
+    if (emailVal.toLowerCase() === "aarav.sharma@campus.edu" && passwordVal === "student123") {
+      completeLoginSuccess({
+        id: "student_demo",
+        name: "Aarav Sharma",
+        email: "aarav.sharma@campus.edu",
+        regNumber: "2024CS1042",
+        role: "student"
+      });
+      return;
+    }
+
+    if (emailVal.includes("@") && passwordVal.length >= 4) {
+      const parsedName = emailVal.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+      completeLoginSuccess({
+        id: "student_" + Date.now(),
+        name: parsedName,
+        email: emailVal,
+        regNumber: "2024CAMPUS" + Math.floor(1000 + Math.random() * 9000),
+        role: "student"
+      });
+      return;
+    }
+
+    if (loginErrorMessage) loginErrorMessage.textContent = "Password must be at least 4 characters.";
+    if (loginErrorAlert) loginErrorAlert.style.display = "flex";
+    if (loginSubmitBtn) {
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtn.textContent = "Sign In as Student";
+    }
+  }
+}
+
+function completeLoginSuccess(user) {
+  currentUser = user;
+  localStorage.setItem("campus_auth_user", JSON.stringify(user));
+
+  if (loginErrorAlert) loginErrorAlert.style.display = "none";
+  if (loginSuccessAlert) {
+    if (loginSuccessMessage) loginSuccessMessage.textContent = `Welcome, ${user.name}!`;
+    loginSuccessAlert.style.display = "flex";
+  }
+
+  setTimeout(() => {
+    closeLoginModal();
+    updateAuthUI();
+
+    if (user.role === "admin") {
+      openAdminModal();
+    } else {
+      showAdminToast(`Signed in as ${user.name}`, "success");
+    }
+
+    if (loginSubmitBtn) {
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtn.textContent = user.role === "admin" ? "Sign In as Administrator" : "Sign In as Student";
+    }
+  }, 600);
+}
+
+function handleLogout() {
+  const prevName = currentUser ? currentUser.name : "User";
+  currentUser = null;
+  localStorage.removeItem("campus_auth_user");
+  updateAuthUI();
+  showAdminToast(`Signed out successfully. See you soon, ${prevName}!`, "info");
+}
+
+
+/* --------------------------------------------------------------------------
+   13. STUDENT DASHBOARD / MY APPLICATIONS MODAL
+   -------------------------------------------------------------------------- */
+async function openStudentAppsModal() {
+  if (!studentAppsModal || !currentUser) return;
+
+  studentAppsModal.classList.add("active");
+  studentAppsModal.setAttribute("aria-hidden", "false");
+
+  if (!studentAppsTableBody) return;
+
+  studentAppsTableBody.innerHTML = `
+    <tr>
+      <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        Loading your applications...
+      </td>
+    </tr>
+  `;
+
+  let apps = [];
+
+  if (isBackendOnline) {
+    try {
+      const response = await fetch(`/api/registrations?search=${encodeURIComponent(currentUser.email)}`);
+      if (response.ok) {
+        const res = await response.json();
+        apps = (res.data || []).filter(a => a.student_email.toLowerCase() === currentUser.email.toLowerCase());
+      }
+    } catch (e) {
+      console.warn("Could not fetch student apps from API:", e);
+    }
+  }
+
+  if (apps.length === 0) {
+    const localRegs = getLocalRegistrations();
+    apps = localRegs.filter(a => a.student_email.toLowerCase() === currentUser.email.toLowerCase());
+  }
+
+  if (apps.length === 0) {
+    studentAppsTableBody.innerHTML = "";
+    if (studentAppsEmptyState) studentAppsEmptyState.style.display = "block";
+    document.getElementById("studentAppsTable").style.display = "none";
+    return;
+  }
+
+  if (studentAppsEmptyState) studentAppsEmptyState.style.display = "none";
+  document.getElementById("studentAppsTable").style.display = "table";
+
+  let rowsHtml = "";
+  for (let i = 0; i < apps.length; i++) {
+    const app = apps[i];
+    const statusClass = app.status === "Approved" ? "status-approved" : app.status === "Rejected" ? "status-rejected" : "status-pending";
+    const statusIcon = app.status === "Approved" ? "✓" : app.status === "Rejected" ? "✕" : "⏳";
+    const dateFormatted = new Date(app.created_at).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+
+    rowsHtml += `
+      <tr>
+        <td><strong>${app.club_name}</strong></td>
+        <td style="color: var(--text-muted); font-size: 0.85rem;">${dateFormatted}</td>
+        <td><span class="reg-badge">${app.reg_number}</span></td>
+        <td>
+          <span class="status-pill ${statusClass}">
+            <span>${statusIcon}</span> ${app.status}
+          </span>
+        </td>
+      </tr>
+    `;
+  }
+
+  studentAppsTableBody.innerHTML = rowsHtml;
+}
+
+function closeStudentAppsModal() {
+  if (studentAppsModal) {
+    studentAppsModal.classList.remove("active");
+    studentAppsModal.setAttribute("aria-hidden", "true");
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   14. MOBILE NAVIGATION
    -------------------------------------------------------------------------- */
 function toggleMobileMenu() {
   navLinks.classList.toggle("active");
@@ -939,12 +1319,13 @@ function handleNavLinkClick() {
 
 
 /* --------------------------------------------------------------------------
-   13. APPLICATION INITIALIZATION & EVENT LISTENERS
+   15. APPLICATION INITIALIZATION & EVENT LISTENERS
    -------------------------------------------------------------------------- */
 function initializeApp() {
   // 1. Initial live data fetch (with automatic Vercel fallback)
   fetchClubs();
   fetchStats();
+  updateAuthUI();
 
   // 2. Category button clicks
   let categoryButtons = categoryContainer.querySelectorAll(".category-btn");
@@ -1004,6 +1385,8 @@ function initializeApp() {
     if (event.target === clubDetailsModal) closeDetailModal();
     if (event.target === joinClubModal) closeJoinModal();
     if (event.target === adminModal) closeAdminModal();
+    if (event.target === loginModal) closeLoginModal();
+    if (event.target === studentAppsModal) closeStudentAppsModal();
   });
 
   // 10. Close modals on Escape key
@@ -1012,6 +1395,8 @@ function initializeApp() {
       closeDetailModal();
       closeJoinModal();
       closeAdminModal();
+      closeLoginModal();
+      closeStudentAppsModal();
     }
   });
 }

@@ -1994,3 +1994,207 @@ button, input, select, textarea {
   }
 }
 
+/* ==========================================================================
+   15. Authentication & Login Modal Styles
+   ========================================================================== */
+
+/* Navbar Auth Elements */
+.nav-auth-container {
+  display: flex;
+  align-items: center;
+}
+
+.nav-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.62rem 1.15rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+}
+
+.nav-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.6rem 0.35rem 0.4rem;
+  background-color: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.nav-user-pill:hover {
+  border-color: var(--primary-border);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.user-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: capitalize;
+}
+
+.btn-logout {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--bg-page);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-left: 0.2rem;
+}
+
+.btn-logout:hover {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* Modal Login Card */
+.modal-login-card {
+  max-width: 480px;
+}
+
+.login-icon-box {
+  background: var(--accent-gradient);
+  color: #ffffff;
+}
+
+/* Role Selector Tabs */
+.login-role-tabs {
+  display: flex;
+  background-color: var(--bg-page);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-light);
+  gap: 4px;
+}
+
+.role-tab {
+  flex: 1;
+  padding: 0.65rem 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.role-tab:hover {
+  color: var(--text-main);
+}
+
+.role-tab.active {
+  background-color: #ffffff;
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-password-btn {
+  background: none;
+  border: none;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+}
+
+.toggle-password-btn:hover {
+  text-decoration: underline;
+}
+
+/* Quick 1-Click Demo Login Box */
+.demo-login-box {
+  margin-top: 1.25rem;
+  padding: 1rem 1.15rem;
+  background-color: var(--primary-light);
+  border: 1px dashed var(--primary-border);
+  border-radius: var(--radius-md);
+}
+
+.demo-title {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1e40af;
+  margin-bottom: 0.6rem;
+}
+
+.demo-btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.btn-demo-fill {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  background-color: #ffffff;
+  color: var(--text-main);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-demo-fill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+

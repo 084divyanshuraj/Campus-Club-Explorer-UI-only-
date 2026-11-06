@@ -96,6 +96,13 @@ http://localhost:5000
 
 ## 📡 REST API Documentation
 
+### 🔐 Authentication Endpoints (`/api/auth`)
+
+| Method | Endpoint | Query / Body | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/login` | `{ email, password, role }` | Authenticate Student or Club Administrator |
+| `GET` | `/api/auth/demo` | None | Retrieve demo credentials for quick evaluation |
+
 ### 🏛️ Clubs Endpoints (`/api/clubs`)
 
 | Method | Endpoint | Query / Body | Description |

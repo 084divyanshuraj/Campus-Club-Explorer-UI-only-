@@ -25,6 +25,7 @@ app.use((req, res, next) => {
 });
 
 // API Routes
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/clubs', require('./routes/clubRoutes'));
 app.use('/api/registrations', require('./routes/registrationRoutes'));
 app.use('/api/stats', require('./routes/statsRoutes'));
@@ -71,6 +72,7 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 CampusConnect Backend Server is LIVE!`);
   console.log(`🌐 Local URL:  http://localhost:${PORT}`);
   console.log(`📡 API Clubs:  http://localhost:${PORT}/api/clubs`);
+  console.log(`🔐 API Auth:   http://localhost:${PORT}/api/auth/login`);
   console.log(`📋 API Regs:   http://localhost:${PORT}/api/registrations`);
   console.log(`📊 API Stats:  http://localhost:${PORT}/api/stats`);
   console.log(`==================================================\n`);
