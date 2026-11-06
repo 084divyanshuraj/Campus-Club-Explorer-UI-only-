@@ -2137,6 +2137,65 @@ button, input, select, textarea {
   box-shadow: var(--shadow-sm);
 }
 
+/* Student Sub-Tabs (Sign In vs Create Account) */
+.auth-sub-tabs {
+  display: flex;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 1.25rem;
+  gap: 4px;
+}
+
+.sub-tab {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.sub-tab:hover {
+  color: var(--text-main);
+}
+
+.sub-tab.active {
+  background-color: #ffffff;
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--primary-border);
+}
+
+.auth-switch-link {
+  display: block;
+  text-align: center;
+  margin-top: 1.15rem;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.auth-switch-link a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-switch-link a:hover {
+  color: var(--primary-dark);
+}
+
 .toggle-password-btn {
   background: none;
   border: none;

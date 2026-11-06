@@ -193,6 +193,7 @@ let currentDetailClub = null;
 // Auth State (Persists in localStorage)
 let currentUser = JSON.parse(localStorage.getItem("campus_auth_user")) || null;
 let currentLoginRole = "student";
+let currentStudentMode = "login"; // "login" or "register"
 
 // Admin Portal State
 let adminStatusFilter = "All";
@@ -1075,6 +1076,9 @@ function openLoginModal(role = "student", noticeMessage = "") {
   }
 
   setLoginRole(role);
+  if (role === "student") {
+    setStudentMode("login");
+  }
 
   const errorAlert = loginErrorAlert || document.getElementById("loginErrorAlert");
   const errorMsg = loginErrorMessage || document.getElementById("loginErrorMessage");
@@ -1104,6 +1108,59 @@ function closeLoginModal() {
   }
 }
 
+function setStudentMode(mode) {
+  currentStudentMode = mode;
+
+  const subTabLogin = document.getElementById("subTabLogin");
+  const subTabRegister = document.getElementById("subTabRegister");
+  const studentFields = document.getElementById("studentAuthFields");
+  const demoBox = document.querySelector(".demo-login-box");
+  const switchLink = document.getElementById("authSwitchLink");
+  const submitBtn = loginSubmitBtn || document.getElementById("loginSubmitBtn");
+  const rolePill = loginRolePill || document.getElementById("loginRolePill");
+  const modalTitle = loginModalTitle || document.getElementById("loginModalTitle");
+  const emailInput = loginEmail || document.getElementById("loginEmail");
+  const passwordInput = loginPassword || document.getElementById("loginPassword");
+  const sName = document.getElementById("loginStudentName");
+  const sReg = document.getElementById("loginRegNumber");
+
+  if (subTabLogin) subTabLogin.classList.toggle("active", mode === "login");
+  if (subTabRegister) subTabRegister.classList.toggle("active", mode === "register");
+
+  const errAlert = loginErrorAlert || document.getElementById("loginErrorAlert");
+  if (errAlert) errAlert.style.display = "none";
+
+  if (mode === "register") {
+    if (studentFields) studentFields.style.display = "block";
+    if (rolePill) rolePill.textContent = "New Student Registration";
+    if (modalTitle) modalTitle.textContent = "Create Student Account";
+    if (submitBtn) submitBtn.textContent = "Create Account & Sign In";
+    if (demoBox) demoBox.style.display = "none";
+    if (switchLink) {
+      switchLink.style.display = "block";
+      switchLink.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="setStudentMode(\'login\')">Sign In here</a>';
+    }
+    // Clear pre-fills for a fresh signup
+    if (sName && sName.value === "Aarav Sharma") sName.value = "";
+    if (sReg && sReg.value === "2024CS1042") sReg.value = "";
+    if (emailInput && emailInput.value === "aarav.sharma@campus.edu") emailInput.value = "";
+    if (passwordInput && passwordInput.value === "student123") passwordInput.value = "";
+  } else {
+    // mode === "login"
+    if (studentFields) studentFields.style.display = "none";
+    if (rolePill) rolePill.textContent = "Campus Student Portal";
+    if (modalTitle) modalTitle.textContent = "Student Sign In";
+    if (submitBtn) submitBtn.textContent = "Sign In to Student Portal";
+    if (demoBox) demoBox.style.display = "block";
+    if (switchLink) {
+      switchLink.style.display = "block";
+      switchLink.innerHTML = 'Don\'t have an account yet? <a href="javascript:void(0)" onclick="setStudentMode(\'register\')">Create Student Account</a>';
+    }
+    if (emailInput && !emailInput.value) emailInput.value = "aarav.sharma@campus.edu";
+    if (passwordInput && !passwordInput.value) passwordInput.value = "student123";
+  }
+}
+
 function setLoginRole(role) {
   currentLoginRole = role;
 
@@ -1119,15 +1176,25 @@ function setLoginRole(role) {
     }
   }
 
+  const studentSubTabs = document.getElementById("studentSubTabs");
+  const studentFields = document.getElementById("studentAuthFields");
+  const demoBox = document.querySelector(".demo-login-box");
+  const switchLink = document.getElementById("authSwitchLink");
   const rolePill = loginRolePill || document.getElementById("loginRolePill");
   const modalTitle = loginModalTitle || document.getElementById("loginModalTitle");
   const emailLabel = loginEmailLabel || document.getElementById("loginEmailLabel");
   const emailInput = loginEmail || document.getElementById("loginEmail");
+  const passwordInput = loginPassword || document.getElementById("loginPassword");
   const submitBtn = loginSubmitBtn || document.getElementById("loginSubmitBtn");
-  const studentFields = document.getElementById("studentAuthFields");
+
+  const errAlert = loginErrorAlert || document.getElementById("loginErrorAlert");
+  if (errAlert) errAlert.style.display = "none";
 
   if (role === "admin") {
+    if (studentSubTabs) studentSubTabs.style.display = "none";
     if (studentFields) studentFields.style.display = "none";
+    if (switchLink) switchLink.style.display = "none";
+    if (demoBox) demoBox.style.display = "block";
     if (rolePill) {
       rolePill.textContent = "Club Lead & Staff Access";
       rolePill.className = "club-category-pill cat-biz";
@@ -1138,55 +1205,32 @@ function setLoginRole(role) {
       emailInput.placeholder = "admin@campus.edu";
       emailInput.value = "admin@campus.edu";
     }
-    if (loginPassword) loginPassword.value = "admin123";
+    if (passwordInput) passwordInput.value = "admin123";
     if (submitBtn) submitBtn.textContent = "Sign In as Administrator";
   } else {
-    if (studentFields) studentFields.style.display = "block";
-    if (rolePill) {
-      rolePill.textContent = "Campus Student Portal";
-      rolePill.className = "club-category-pill cat-tech";
-    }
-    if (modalTitle) modalTitle.textContent = "Student Sign In";
+    // role === "student"
+    if (studentSubTabs) studentSubTabs.style.display = "flex";
     if (emailLabel) emailLabel.innerHTML = 'College Email <span class="required-star">*</span>';
-    if (emailInput) {
-      emailInput.placeholder = "e.g. aarav.sharma@campus.edu";
-      if (!emailInput.value || emailInput.value === "admin@campus.edu") {
-        emailInput.value = "aarav.sharma@campus.edu";
-      }
-    }
-    if (loginPassword && (!loginPassword.value || loginPassword.value === "admin123")) {
-      loginPassword.value = "student123";
-    }
-    if (submitBtn) submitBtn.textContent = "Sign In as Student";
+    if (emailInput) emailInput.placeholder = "e.g. aarav.sharma@campus.edu";
+    setStudentMode(currentStudentMode || "login");
   }
 }
 
 function useDemoLogin(role) {
-  setLoginRole(role === "admin" ? "admin" : "student");
-
-  const sName = document.getElementById("loginStudentName");
-  const sReg = document.getElementById("loginRegNumber");
-  const sDept = document.getElementById("loginDepartment");
-  const sYear = document.getElementById("loginYear");
-
   if (role === "admin") {
+    setLoginRole("admin");
     if (loginEmail) loginEmail.value = "admin@campus.edu";
     if (loginPassword) loginPassword.value = "admin123";
-  } else if (role === "student2") {
-    if (sName) sName.value = "Priya Nair";
-    if (sReg) sReg.value = "2024EC2105";
-    if (sDept) sDept.value = "Electronics & Communication";
-    if (sYear) sYear.value = "1st Year (Freshman)";
-    if (loginEmail) loginEmail.value = "priya.nair@campus.edu";
-    if (loginPassword) loginPassword.value = "student123";
   } else {
-    // Default student (Aarav)
-    if (sName) sName.value = "Aarav Sharma";
-    if (sReg) sReg.value = "2024CS1042";
-    if (sDept) sDept.value = "Computer Science & Engineering";
-    if (sYear) sYear.value = "2nd Year (Sophomore)";
-    if (loginEmail) loginEmail.value = "aarav.sharma@campus.edu";
-    if (loginPassword) loginPassword.value = "student123";
+    setLoginRole("student");
+    setStudentMode("login");
+    if (role === "student2") {
+      if (loginEmail) loginEmail.value = "priya.nair@campus.edu";
+      if (loginPassword) loginPassword.value = "student123";
+    } else {
+      if (loginEmail) loginEmail.value = "aarav.sharma@campus.edu";
+      if (loginPassword) loginPassword.value = "student123";
+    }
   }
   handleLoginSubmit(new Event("submit"));
 }
@@ -1226,7 +1270,9 @@ async function handleLoginSubmit(event) {
     return;
   }
 
-  if (currentLoginRole === "student") {
+  const isRegistering = (currentLoginRole === "student" && currentStudentMode === "register");
+
+  if (isRegistering) {
     if (!nameVal) {
       if (loginErrorMessage) loginErrorMessage.textContent = "Please enter your full student name.";
       if (loginErrorAlert) loginErrorAlert.style.display = "flex";
@@ -1237,28 +1283,39 @@ async function handleLoginSubmit(event) {
       if (loginErrorAlert) loginErrorAlert.style.display = "flex";
       return;
     }
+    if (passwordVal.length < 4) {
+      if (loginErrorMessage) loginErrorMessage.textContent = "Password must be at least 4 characters.";
+      if (loginErrorAlert) loginErrorAlert.style.display = "flex";
+      return;
+    }
   }
 
   if (loginSubmitBtn) {
     loginSubmitBtn.disabled = true;
-    loginSubmitBtn.textContent = "Signing In...";
+    loginSubmitBtn.textContent = isRegistering ? "Creating Account..." : "Signing In...";
   }
 
   // 1. Try Live Express REST Backend API
   if (isBackendOnline) {
     try {
-      const response = await fetch("/api/auth/login", {
+      const endpoint = isRegistering ? "/api/auth/register" : "/api/auth/login";
+      const payload = isRegistering ? {
+        name: nameVal,
+        email: emailVal,
+        password: passwordVal,
+        regNumber: regVal,
+        department: deptVal,
+        year: yearVal
+      } : {
+        email: emailVal,
+        password: passwordVal,
+        role: currentLoginRole
+      };
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: emailVal,
-          password: passwordVal,
-          role: currentLoginRole,
-          name: nameVal,
-          regNumber: regVal,
-          department: deptVal,
-          year: yearVal
-        })
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();
@@ -1266,16 +1323,15 @@ async function handleLoginSubmit(event) {
         completeLoginSuccess(result.user);
         return;
       }
-      throw new Error(result.message || "Invalid credentials.");
+      throw new Error(result.message || "Authentication failed.");
     } catch (err) {
       console.warn("Backend auth failed, checking fallback:", err);
-      // Fallback allowed if offline/Vercel
       if (isBackendOnline) {
         if (loginErrorMessage) loginErrorMessage.textContent = err.message;
         if (loginErrorAlert) loginErrorAlert.style.display = "flex";
         if (loginSubmitBtn) {
           loginSubmitBtn.disabled = false;
-          loginSubmitBtn.textContent = currentLoginRole === "admin" ? "Sign In as Administrator" : "Sign In as Student";
+          loginSubmitBtn.textContent = isRegistering ? "Create Account & Sign In" : (currentLoginRole === "admin" ? "Sign In as Administrator" : "Sign In to Student Portal");
         }
         return;
       }
@@ -1302,29 +1358,68 @@ async function handleLoginSubmit(event) {
       return;
     }
   } else {
-    // Student Fallback - Aarav
+    // Student Fallback (Register vs Login)
+    const registeredStudents = JSON.parse(localStorage.getItem("campus_registered_students") || "[]");
+
+    if (isRegistering) {
+      const alreadyExists = registeredStudents.some(s => s.email.toLowerCase() === emailVal.toLowerCase());
+      if (alreadyExists || emailVal.toLowerCase() === "aarav.sharma@campus.edu" || emailVal.toLowerCase() === "priya.nair@campus.edu") {
+        if (loginErrorMessage) loginErrorMessage.textContent = "An account with this email address already exists. Please sign in.";
+        if (loginErrorAlert) loginErrorAlert.style.display = "flex";
+        if (loginSubmitBtn) {
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtn.textContent = "Create Account & Sign In";
+        }
+        return;
+      }
+
+      const newStudent = {
+        id: "student_" + Date.now(),
+        name: nameVal,
+        email: emailVal,
+        password: passwordVal,
+        regNumber: regVal,
+        department: deptVal,
+        year: yearVal,
+        role: "student"
+      };
+
+      registeredStudents.push(newStudent);
+      localStorage.setItem("campus_registered_students", JSON.stringify(registeredStudents));
+      completeLoginSuccess(newStudent);
+      return;
+    }
+
+    // Match in locally registered students
+    const matchedUser = registeredStudents.find(s => s.email.toLowerCase() === emailVal.toLowerCase() && s.password === passwordVal);
+    if (matchedUser) {
+      completeLoginSuccess(matchedUser);
+      return;
+    }
+
+    // Demo student Aarav
     if (emailVal.toLowerCase() === "aarav.sharma@campus.edu" && passwordVal === "student123") {
       completeLoginSuccess({
         id: "student_demo",
-        name: nameVal || "Aarav Sharma",
+        name: "Aarav Sharma",
         email: "aarav.sharma@campus.edu",
-        regNumber: regVal || "2024CS1042",
-        department: deptVal || "Computer Science & Engineering",
-        year: yearVal || "2nd Year (Sophomore)",
+        regNumber: "2024CS1042",
+        department: "Computer Science & Engineering",
+        year: "2nd Year (Sophomore)",
         role: "student"
       });
       return;
     }
 
-    // Student Fallback - Priya
+    // Demo student Priya
     if (emailVal.toLowerCase() === "priya.nair@campus.edu" && passwordVal === "student123") {
       completeLoginSuccess({
         id: "student_demo_2",
-        name: nameVal || "Priya Nair",
+        name: "Priya Nair",
         email: "priya.nair@campus.edu",
-        regNumber: regVal || "2024EC2105",
-        department: deptVal || "Electronics & Communication",
-        year: yearVal || "1st Year (Freshman)",
+        regNumber: "2024EC2105",
+        department: "Electronics & Communication",
+        year: "1st Year (Freshman)",
         role: "student"
       });
       return;
@@ -1345,11 +1440,11 @@ async function handleLoginSubmit(event) {
       return;
     }
 
-    if (loginErrorMessage) loginErrorMessage.textContent = "Password must be at least 4 characters.";
+    if (loginErrorMessage) loginErrorMessage.textContent = "Invalid email or password.";
     if (loginErrorAlert) loginErrorAlert.style.display = "flex";
     if (loginSubmitBtn) {
       loginSubmitBtn.disabled = false;
-      loginSubmitBtn.textContent = "Sign In as Student";
+      loginSubmitBtn.textContent = "Sign In to Student Portal";
     }
   }
 }

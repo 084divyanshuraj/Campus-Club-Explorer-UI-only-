@@ -1,7 +1,8 @@
 /**
  * Authentication Controller
- * Handles user login (Student & Admin) with zero-friction demo support
+ * Handles user login & registration (Student & Admin) with zero-friction demo support
  */
+const { db } = require('../config/db');
 
 const DEMO_USERS = {
   admin: {
@@ -73,6 +74,28 @@ exports.login = (req, res) => {
 
     // 2. Student Verification
     if (targetRole === 'student') {
+      // Check database registered users table first
+      try {
+        const dbUser = db.prepare('SELECT * FROM users WHERE LOWER(email) = ? AND password = ?').get(trimmedEmail, password);
+        if (dbUser) {
+          return res.json({
+            success: true,
+            message: `Welcome back, ${dbUser.name}!`,
+            user: {
+              id: 'student_' + dbUser.id,
+              name: dbUser.name,
+              email: dbUser.email,
+              regNumber: dbUser.reg_number,
+              department: dbUser.department,
+              year: dbUser.year,
+              role: dbUser.role
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('DB user query fallback:', err.message);
+      }
+
       // Demo student match
       if (trimmedEmail === DEMO_USERS.student.email && password === DEMO_USERS.student.password) {
         return res.json({
@@ -139,6 +162,68 @@ exports.login = (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ success: false, message: 'Server error during authentication.' });
+  }
+};
+
+/**
+ * @desc   Register a new Student Account
+ * @route  POST /api/auth/register
+ */
+exports.register = (req, res) => {
+  try {
+    const name = (req.body.name || req.body.studentName || '').trim();
+    const email = (req.body.email || req.body.studentEmail || '').trim().toLowerCase();
+    const password = (req.body.password || '').trim();
+    const regNumber = (req.body.regNumber || req.body.reg_number || '').trim().toUpperCase();
+    const department = (req.body.department || 'Computer Science & Engineering').trim();
+    const year = (req.body.year || '2nd Year (Sophomore)').trim();
+
+    if (!name) {
+      return res.status(400).json({ success: false, message: 'Please provide your full student name.' });
+    }
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid college email address.' });
+    }
+    if (!password || password.length < 4) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 4 characters long.' });
+    }
+    if (!regNumber) {
+      return res.status(400).json({ success: false, message: 'University registration / roll number is required.' });
+    }
+
+    // Check if user already exists
+    const existing = db.prepare('SELECT id FROM users WHERE LOWER(email) = ?').get(email);
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: 'An account with this email address already exists. Please sign in.'
+      });
+    }
+
+    const insertStmt = db.prepare(`
+      INSERT INTO users (name, email, password, reg_number, department, year, role)
+      VALUES (?, ?, ?, ?, ?, ?, 'student')
+    `);
+    const result = insertStmt.run(name, email, password, regNumber, department, year);
+
+    const newUser = {
+      id: 'student_' + result.lastInsertRowid,
+      name,
+      email,
+      regNumber,
+      department,
+      year,
+      role: 'student'
+    };
+
+    return res.status(201).json({
+      success: true,
+      message: `Account created successfully! Welcome to CampusConnect, ${name}.`,
+      user: newUser
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ success: false, message: 'Server error during student registration.' });
   }
 };
 

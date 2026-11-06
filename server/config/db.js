@@ -57,6 +57,33 @@ function initDatabase() {
   try { db.exec("ALTER TABLE registrations ADD COLUMN department TEXT DEFAULT 'Computer Science & Engineering';"); } catch(e){}
   try { db.exec("ALTER TABLE registrations ADD COLUMN year TEXT DEFAULT '2nd Year';"); } catch(e){}
 
+  // 3. Users Table (For Student Account Registration & Login)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL,
+      reg_number TEXT NOT NULL,
+      department TEXT DEFAULT 'Computer Science & Engineering',
+      year TEXT DEFAULT '2nd Year',
+      role TEXT DEFAULT 'student',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // Seed default users if empty
+  const userCountRow = db.prepare('SELECT COUNT(*) as count FROM users').get();
+  if (userCountRow.count === 0) {
+    const insertUser = db.prepare(`
+      INSERT INTO users (name, email, password, reg_number, department, year, role)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    insertUser.run('Aarav Sharma', 'aarav.sharma@campus.edu', 'student123', '2024CS1042', 'Computer Science & Engineering', '2nd Year', 'student');
+    insertUser.run('Priya Nair', 'priya.nair@campus.edu', 'student123', '2024EC2105', 'Electronics & Communication', '1st Year', 'student');
+    insertUser.run('Campus Administrator', 'admin@campus.edu', 'admin123', 'ADMIN01', 'Administration', 'Staff', 'admin');
+  }
+
   // Check if clubs need seeding
   const clubCountRow = db.prepare('SELECT COUNT(*) as count FROM clubs').get();
   if (clubCountRow.count === 0) {
