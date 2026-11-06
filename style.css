@@ -1136,8 +1136,9 @@ button, input, select, textarea {
 
 /* Active State for Modals */
 .modal-backdrop.active {
-  opacity: 1;
-  visibility: visible;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
 }
 
 .modal-card {

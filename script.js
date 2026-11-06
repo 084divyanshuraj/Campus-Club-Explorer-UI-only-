@@ -594,14 +594,22 @@ function openDetailModal(clubId) {
     }
     detailActivitiesList.innerHTML = activitiesHtml;
 
-    clubDetailsModal.classList.add("active");
-    clubDetailsModal.setAttribute("aria-hidden", "false");
+    const modal = clubDetailsModal || document.getElementById("clubDetailsModal");
+    if (modal) {
+      modal.classList.add("active");
+      modal.style.display = "flex";
+      modal.setAttribute("aria-hidden", "false");
+    }
   }
 }
 
 function closeDetailModal() {
-  clubDetailsModal.classList.remove("active");
-  clubDetailsModal.setAttribute("aria-hidden", "true");
+  const modal = clubDetailsModal || document.getElementById("clubDetailsModal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
 }
 
 function switchToJoinFromDetails() {
@@ -637,13 +645,21 @@ function openJoinModal(preselectedClubName) {
     clubSelectDropdown.value = preselectedClubName;
   }
 
-  joinClubModal.classList.add("active");
-  joinClubModal.setAttribute("aria-hidden", "false");
+  const modal = joinClubModal || document.getElementById("joinClubModal");
+  if (modal) {
+    modal.classList.add("active");
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+  }
 }
 
 function closeJoinModal() {
-  joinClubModal.classList.remove("active");
-  joinClubModal.setAttribute("aria-hidden", "true");
+  const modal = joinClubModal || document.getElementById("joinClubModal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
 }
 
 async function handleJoinFormSubmit(event) {
@@ -750,15 +766,23 @@ function completeRegistrationSuccess() {
    11. ADMIN APPLICATIONS MANAGEMENT PORTAL (Hybrid API + Standalone)
    -------------------------------------------------------------------------- */
 function openAdminModal() {
-  adminModal.classList.add("active");
-  adminModal.setAttribute("aria-hidden", "false");
+  const modal = adminModal || document.getElementById("adminModal");
+  if (modal) {
+    modal.classList.add("active");
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+  }
   loadAdminRegistrations();
   fetchStats();
 }
 
 function closeAdminModal() {
-  adminModal.classList.remove("active");
-  adminModal.setAttribute("aria-hidden", "true");
+  const modal = adminModal || document.getElementById("adminModal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
 }
 
 function showAdminToast(message, type = "success") {
@@ -998,64 +1022,81 @@ function handleAdminNavClick() {
 }
 
 function openLoginModal(role = "student", noticeMessage = "") {
-  if (!loginModal) return;
+  const modal = loginModal || document.getElementById("loginModal");
+  if (!modal) {
+    console.error("loginModal element not found in DOM.");
+    return;
+  }
 
   setLoginRole(role);
 
-  if (loginErrorAlert) {
+  const errorAlert = loginErrorAlert || document.getElementById("loginErrorAlert");
+  const errorMsg = loginErrorMessage || document.getElementById("loginErrorMessage");
+  if (errorAlert) {
     if (noticeMessage) {
-      if (loginErrorMessage) loginErrorMessage.textContent = noticeMessage;
-      loginErrorAlert.style.display = "flex";
+      if (errorMsg) errorMsg.textContent = noticeMessage;
+      errorAlert.style.display = "flex";
     } else {
-      loginErrorAlert.style.display = "none";
+      errorAlert.style.display = "none";
     }
   }
 
-  if (loginSuccessAlert) loginSuccessAlert.style.display = "none";
+  const successAlert = loginSuccessAlert || document.getElementById("loginSuccessAlert");
+  if (successAlert) successAlert.style.display = "none";
 
-  loginModal.classList.add("active");
-  loginModal.setAttribute("aria-hidden", "false");
+  modal.classList.add("active");
+  modal.style.display = "flex";
+  modal.setAttribute("aria-hidden", "false");
 }
 
 function closeLoginModal() {
-  if (loginModal) {
-    loginModal.classList.remove("active");
-    loginModal.setAttribute("aria-hidden", "true");
+  const modal = loginModal || document.getElementById("loginModal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
   }
 }
 
 function setLoginRole(role) {
   currentLoginRole = role;
 
-  if (loginRoleTabs) {
-    const tabs = loginRoleTabs.querySelectorAll(".role-tab");
-    tabs.forEach(tab => {
-      if (tab.getAttribute("data-role") === role) {
-        tab.classList.add("active");
+  const roleTabs = loginRoleTabs || document.getElementById("loginRoleTabs");
+  if (roleTabs) {
+    const tabs = roleTabs.querySelectorAll(".role-tab");
+    for (let i = 0; i < tabs.length; i++) {
+      if (tabs[i].getAttribute("data-role") === role) {
+        tabs[i].classList.add("active");
       } else {
-        tab.classList.remove("active");
+        tabs[i].classList.remove("active");
       }
-    });
+    }
   }
 
+  const rolePill = loginRolePill || document.getElementById("loginRolePill");
+  const modalTitle = loginModalTitle || document.getElementById("loginModalTitle");
+  const emailLabel = loginEmailLabel || document.getElementById("loginEmailLabel");
+  const emailInput = loginEmail || document.getElementById("loginEmail");
+  const submitBtn = loginSubmitBtn || document.getElementById("loginSubmitBtn");
+
   if (role === "admin") {
-    if (loginRolePill) {
-      loginRolePill.textContent = "Club Lead & Staff Access";
-      loginRolePill.className = "club-category-pill cat-biz";
+    if (rolePill) {
+      rolePill.textContent = "Club Lead & Staff Access";
+      rolePill.className = "club-category-pill cat-biz";
     }
-    if (loginModalTitle) loginModalTitle.textContent = "Club Admin Sign In";
-    if (loginEmailLabel) loginEmailLabel.innerHTML = 'Admin Email <span class="required-star">*</span>';
-    if (loginEmail) loginEmail.placeholder = "admin@campus.edu";
-    if (loginSubmitBtn) loginSubmitBtn.textContent = "Sign In as Administrator";
+    if (modalTitle) modalTitle.textContent = "Club Admin Sign In";
+    if (emailLabel) emailLabel.innerHTML = 'Admin Email <span class="required-star">*</span>';
+    if (emailInput) emailInput.placeholder = "admin@campus.edu";
+    if (submitBtn) submitBtn.textContent = "Sign In as Administrator";
   } else {
-    if (loginRolePill) {
-      loginRolePill.textContent = "Campus Student Portal";
-      loginRolePill.className = "club-category-pill cat-tech";
+    if (rolePill) {
+      rolePill.textContent = "Campus Student Portal";
+      rolePill.className = "club-category-pill cat-tech";
     }
-    if (loginModalTitle) loginModalTitle.textContent = "Student Sign In";
-    if (loginEmailLabel) loginEmailLabel.innerHTML = 'College Email <span class="required-star">*</span>';
-    if (loginEmail) loginEmail.placeholder = "e.g. aarav.sharma@campus.edu";
-    if (loginSubmitBtn) loginSubmitBtn.textContent = "Sign In as Student";
+    if (modalTitle) modalTitle.textContent = "Student Sign In";
+    if (emailLabel) emailLabel.innerHTML = 'College Email <span class="required-star">*</span>';
+    if (emailInput) emailInput.placeholder = "e.g. aarav.sharma@campus.edu";
+    if (submitBtn) submitBtn.textContent = "Sign In as Student";
   }
 }
 
@@ -1224,14 +1265,17 @@ function handleLogout() {
    13. STUDENT DASHBOARD / MY APPLICATIONS MODAL
    -------------------------------------------------------------------------- */
 async function openStudentAppsModal() {
-  if (!studentAppsModal || !currentUser) return;
+  const modal = studentAppsModal || document.getElementById("studentAppsModal");
+  if (!modal || !currentUser) return;
 
-  studentAppsModal.classList.add("active");
-  studentAppsModal.setAttribute("aria-hidden", "false");
+  modal.classList.add("active");
+  modal.style.display = "flex";
+  modal.setAttribute("aria-hidden", "false");
 
-  if (!studentAppsTableBody) return;
+  const tableBody = studentAppsTableBody || document.getElementById("studentAppsTableBody");
+  if (!tableBody) return;
 
-  studentAppsTableBody.innerHTML = `
+  tableBody.innerHTML = `
     <tr>
       <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">
         Loading your applications...
@@ -1258,15 +1302,18 @@ async function openStudentAppsModal() {
     apps = localRegs.filter(a => a.student_email.toLowerCase() === currentUser.email.toLowerCase());
   }
 
+  const emptyState = studentAppsEmptyState || document.getElementById("studentAppsEmptyState");
+  const appsTable = document.getElementById("studentAppsTable");
+
   if (apps.length === 0) {
-    studentAppsTableBody.innerHTML = "";
-    if (studentAppsEmptyState) studentAppsEmptyState.style.display = "block";
-    document.getElementById("studentAppsTable").style.display = "none";
+    tableBody.innerHTML = "";
+    if (emptyState) emptyState.style.display = "block";
+    if (appsTable) appsTable.style.display = "none";
     return;
   }
 
-  if (studentAppsEmptyState) studentAppsEmptyState.style.display = "none";
-  document.getElementById("studentAppsTable").style.display = "table";
+  if (emptyState) emptyState.style.display = "none";
+  if (appsTable) appsTable.style.display = "table";
 
   let rowsHtml = "";
   for (let i = 0; i < apps.length; i++) {
@@ -1293,13 +1340,15 @@ async function openStudentAppsModal() {
     `;
   }
 
-  studentAppsTableBody.innerHTML = rowsHtml;
+  tableBody.innerHTML = rowsHtml;
 }
 
 function closeStudentAppsModal() {
-  if (studentAppsModal) {
-    studentAppsModal.classList.remove("active");
-    studentAppsModal.setAttribute("aria-hidden", "true");
+  const modal = studentAppsModal || document.getElementById("studentAppsModal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
   }
 }
 
@@ -1382,11 +1431,11 @@ function initializeApp() {
 
   // 9. Close modals on background overlay click
   window.addEventListener("click", function(event) {
-    if (event.target === clubDetailsModal) closeDetailModal();
-    if (event.target === joinClubModal) closeJoinModal();
-    if (event.target === adminModal) closeAdminModal();
-    if (event.target === loginModal) closeLoginModal();
-    if (event.target === studentAppsModal) closeStudentAppsModal();
+    if (event.target === clubDetailsModal || event.target.id === "clubDetailsModal") closeDetailModal();
+    if (event.target === joinClubModal || event.target.id === "joinClubModal") closeJoinModal();
+    if (event.target === adminModal || event.target.id === "adminModal") closeAdminModal();
+    if (event.target === loginModal || event.target.id === "loginModal") closeLoginModal();
+    if (event.target === studentAppsModal || event.target.id === "studentAppsModal") closeStudentAppsModal();
   });
 
   // 10. Close modals on Escape key
